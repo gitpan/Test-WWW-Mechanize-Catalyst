@@ -1,0 +1,7 @@
+Build.PL
+CHANGES
+lib/Test/WWW/Mechanize/Catalyst.pm
+MANIFEST			This list of files
+t/lib/Catty.pm
+t/simple.t
+META.yml
