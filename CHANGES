@@ -1,4 +1,11 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.30 Fri Mar 25 04:34:50 GMT 2005
+     - add Test::WWW::Mechanize to prereqs
+     - remove useless "use URI"
+     - "borrow" lots of docs from Test::WWW::Mechanize
+     - Catalyst 4.30 adds support for HTTP::Request objects in
+       Catalyst::Test::request(), so use it (thanks to Christian Hansen)
+
 0.29 Thu Mar 17 22:42:04 EST 2005
      - initial release
