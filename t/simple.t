@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use lib 'lib';
 use Image::Size;
-use Test::More tests => 8;
+use Test::More tests => 9;
 use lib 't/lib';
 use Test::WWW::Mechanize::Catalyst 'Catty';
 
@@ -16,6 +16,7 @@ $m->title_is("Root");
 $m->content_contains("This is the root page");
 
 $m->follow_link_ok({text => 'Hello'});
+is($m->base, "http://localhost/hello/");
 is($m->ct, "text/html");
 $m->title_is("Hello");
 $m->content_contains("Hi there");

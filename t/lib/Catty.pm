@@ -12,18 +12,21 @@ Catty->config(
     root => cwd . '/t/root',
 );
 
-Catty->action(
-  '!default' => sub {
-    my($self, $c) = @_;
-    my $html = html("Root", "This is the root page");
-    $c->res->output($html);
-  },
-  'hello' => sub {
-    my($self, $c) = @_;
-    my $html = html("Hello", "Hi there!");
-    $c->res->output($html);
-  },
-);
+Catty->setup();
+
+sub default : Private {
+  my($self, $context) = @_;
+  my $html = html("Root", "This is the root page");
+  $context->response->content_type("text/html");
+  $context->response->output($html);
+}
+
+sub hello : Global {
+  my($self, $context) = @_;
+  my $html = html("Hello", "Hi there!");
+  $context->response->content_type("text/html");
+  $context->response->output($html);
+}
 
 sub html {
   my($title, $body) = @_;

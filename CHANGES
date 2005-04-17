@@ -1,5 +1,8 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.31 Sun Apr 17 10:30:18 BST 2005
+     - update for Catalyst 5.00
+
 0.30 Fri Mar 25 04:34:50 GMT 2005
      - add Test::WWW::Mechanize to prereqs
      - remove useless "use URI"

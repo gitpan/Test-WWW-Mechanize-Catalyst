@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::WWW::Mechanize;
 use base qw(Test::WWW::Mechanize);
-our $VERSION = "0.30";
+our $VERSION = "0.31";
 
 # the reason for the auxiliary package is that both WWW::Mechanize and
 # Catalyst::Test have a subroutine named 'request'
@@ -23,6 +23,7 @@ package Test::WWW::Mechanize::Catalyst::Aux;
 sub import {
   my($class, $name) = @_;
   eval "use Catalyst::Test '$name'";
+  warn $@ if $@;
 }
 
 1;
