@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 use lib 'lib';
-use Image::Size;
 use Test::More tests => 9;
 use lib 't/lib';
 use Test::WWW::Mechanize::Catalyst 'Catty';

@@ -1,5 +1,8 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.32 Tue May  3 16:14:40 BST 2005
+     - removed 'use Image::Size' in test, as spotted by SMPETERS
+
 0.31 Sun Apr 17 10:30:18 BST 2005
      - update for Catalyst 5.00
 
