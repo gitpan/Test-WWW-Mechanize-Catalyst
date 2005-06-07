@@ -1,5 +1,9 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.33 Tue Jun  7 17:38:45 BST 2005
+     - we need at least version 1.04 of Test::WWW::Mechanize 
+       (spotted by Jesse Vincent, patch by Shlomi Fish)
+
 0.32 Tue May  3 16:14:40 BST 2005
      - removed 'use Image::Size' in test, as spotted by SMPETERS
 

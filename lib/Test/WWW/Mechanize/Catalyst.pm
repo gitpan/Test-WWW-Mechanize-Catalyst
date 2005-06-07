@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::WWW::Mechanize;
 use base qw(Test::WWW::Mechanize);
-our $VERSION = "0.32";
+our $VERSION = "0.33";
 
 # the reason for the auxiliary package is that both WWW::Mechanize and
 # Catalyst::Test have a subroutine named 'request'

@@ -8,7 +8,7 @@ my $build = Module::Build->new(
   requires           => {
     'Test::More' => '0',
     'Catalyst'   => '5.00',
-    'Test::WWW::Mechanize' => '0',
+    'Test::WWW::Mechanize' => '1.04',
   },
 );
 $build->create_build_script;

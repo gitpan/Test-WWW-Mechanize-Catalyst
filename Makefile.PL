@@ -9,7 +9,7 @@ WriteMakefile
           'PREREQ_PM' => {
                            'Test::More' => '0',
                            'Catalyst' => '5.00',
-                           'Test::WWW::Mechanize' => '0'
+                           'Test::WWW::Mechanize' => '1.04'
                          }
         )
 ;
