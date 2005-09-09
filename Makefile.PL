@@ -2,14 +2,14 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-          'PL_FILES' => {},
-          'INSTALLDIRS' => 'site',
           'NAME' => 'Test::WWW::Mechanize::Catalyst',
           'VERSION_FROM' => 'lib/Test/WWW/Mechanize/Catalyst.pm',
           'PREREQ_PM' => {
-                           'Test::More' => '0',
                            'Catalyst' => '5.00',
+                           'Test::More' => '0',
                            'Test::WWW::Mechanize' => '1.04'
-                         }
+                         },
+          'INSTALLDIRS' => 'site',
+          'PL_FILES' => {}
         )
 ;

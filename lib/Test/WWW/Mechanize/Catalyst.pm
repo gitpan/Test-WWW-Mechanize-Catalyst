@@ -3,15 +3,18 @@ use strict;
 use warnings;
 use Test::WWW::Mechanize;
 use base qw(Test::WWW::Mechanize);
-our $VERSION = "0.33";
+our $VERSION = "0.34";
 
 # the reason for the auxiliary package is that both WWW::Mechanize and
 # Catalyst::Test have a subroutine named 'request'
 
 sub _make_request {
-  my($self, $request) = @_;
+  my ($self, $request) = @_;
+  $self->cookie_jar->add_cookie_header($request) if $self->cookie_jar;
   my $response = Test::WWW::Mechanize::Catalyst::Aux::request($request);
   $response->header('Content-Base', $request->uri);
+  $response->request($request);
+  $self->cookie_jar->extract_cookies($response) if $self->cookie_jar;
   return $response;
 }
 
@@ -20,8 +23,9 @@ sub import {
 }
 
 package Test::WWW::Mechanize::Catalyst::Aux;
+
 sub import {
-  my($class, $name) = @_;
+  my ($class, $name) = @_;
   eval "use Catalyst::Test '$name'";
   warn $@ if $@;
 }
@@ -72,8 +76,10 @@ functions for common web testing scenarios. For example:
   $mech->content_contains( "Andy Lester", "My name somewhere" );
   $mech->content_like( qr/(cpan|perl)\.org/, "Link to perl.org or CPAN" );
 
+This module supports cookies automatically.
+
 To use this module you must pass it the name of the application. See
-the SYNOPSIS above.
+the SYNOPSIS above. 
 
 =head1 CONSTRUCTOR
 
