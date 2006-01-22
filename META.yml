@@ -1,19 +1,8 @@
----
+--- #YAML:1.0
 name: Test-WWW-Mechanize-Catalyst
-version: 0.34
+version: 0.35
 author:
-  - 'Leon Brocard, C<< <acme@astray.com> >>'
+  - Leon Brocard, C<< <acme@astray.com> >>
 abstract: Test::WWW::Mechanize for Catalyst
 license: perl
-requires:
-  Catalyst: 5.00
-  Test::More: 0
-  Test::WWW::Mechanize: 1.04
-provides:
-  Test::WWW::Mechanize::Catalyst:
-    file: lib/Test/WWW/Mechanize/Catalyst.pm
-    version: 0.34
-  Test::WWW::Mechanize::Catalyst::Aux:
-    file: lib/Test/WWW/Mechanize/Catalyst.pm
-    version: 0.34
-generated_by: Module::Build version 0.2611
+generated_by: Module::Build version 0.2611, without YAML.pm

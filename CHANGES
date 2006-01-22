@@ -1,7 +1,7 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
-0.34 Fri Sep  9 23:39:56 BST 2005
-     - added support for cookies
+0.35 Tue Jan 22 17:06:00 GMT 2006
+     - handle redirects (patch by Mark Fowler)
 
 0.33 Tue Jun  7 17:38:45 BST 2005
      - we need at least version 1.04 of Test::WWW::Mechanize 

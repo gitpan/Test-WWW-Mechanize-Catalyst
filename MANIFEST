@@ -9,3 +9,4 @@ t/lib/Catty.pm
 t/pod.t
 t/pod_coverage.t
 t/simple.t
+t/redirect.t
