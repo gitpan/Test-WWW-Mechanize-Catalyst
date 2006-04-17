@@ -1,8 +1,8 @@
 package Catty;
 
 use strict;
-use Catalyst;
-#use Catalyst qw/-Debug/;
+#use Catalyst;
+use Catalyst qw/-Debug/;
 use Cwd;
 
 our $VERSION = '0.01';
@@ -49,6 +49,14 @@ sub bonjour : Global {
   my $where = $context->uri_for('hi');
   $context->response->redirect( $where );
   return;
+}
+
+sub die : Global {
+  my($self, $context) = @_;
+  my $html = html("Die", "This is the die page");
+  $context->response->content_type("text/html");
+  $context->response->output($html);
+  die "erk!";
 }
 
 sub html {

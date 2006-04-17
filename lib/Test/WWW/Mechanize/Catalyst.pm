@@ -3,55 +3,66 @@ use strict;
 use warnings;
 use Test::WWW::Mechanize;
 use base qw(Test::WWW::Mechanize);
-our $VERSION = "0.35";
+our $VERSION = "0.36";
 
 # the reason for the auxiliary package is that both WWW::Mechanize and
 # Catalyst::Test have a subroutine named 'request'
 
 sub _make_request {
-  my($self, $request) = @_;
-  $self->cookie_jar->add_cookie_header($request) if $self->cookie_jar;
-  my $response = Test::WWW::Mechanize::Catalyst::Aux::request($request);
-  $response->header('Content-Base', $request->uri);
-  $response->request($request);
-  $self->cookie_jar->extract_cookies($response) if $self->cookie_jar;
-  
-  # check if that was a redirect.  These codes based off of
-  # http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-  if (grep { $response->code() == $_ } 301, 302, 307) {
+    my ( $self, $request ) = @_;
+    $self->cookie_jar->add_cookie_header($request) if $self->cookie_jar;
+    my $response = Test::WWW::Mechanize::Catalyst::Aux::request($request);
+    $response->header( 'Content-Base', $request->uri );
+    $response->request($request);
+    $self->cookie_jar->extract_cookies($response) if $self->cookie_jar;
 
-    # remember the old response
-    my $old_response = $response;
-    
-    # *where* do they want us to redirect to?
-    my $location = $old_response->header('Location');
+    # fail tests under the Catalyst debug screen
+    if (   !$self->{catalyst_debug}
+        && $response->code == 500
+        && $response->content =~ /on Catalyst \d+\.\d+/ )
+    {
+        $response->content('');
+        $response->content_type('');
+    }
 
-    # no-one *should* be returning non-absolute URLs, but if they
-    # are then we'd better cope with it.  Let's create a new URI, using
-    # our request as the base.
-    my $uri = URI->new_abs( $location, $request->uri )->as_string;
+    # check if that was a redirect.  These codes based off of
+    # http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+    if ( grep { $response->code() == $_ } 301, 302, 307 ) {
 
-    # make a new response, and save the old response in it
-    $response = $self->_make_request( HTTP::Request->new(GET => $uri) );
-    my $end_of_chain = $response;
-    while ($end_of_chain->previous)                # keep going till the end
-      { $end_of_chain = $end_of_chain->previous }  #   of the chain...
-    $end_of_chain->previous($old_response);        # ...and add us to it
-  }
-  
-  return $response;
+        # remember the old response
+        my $old_response = $response;
+
+        # *where* do they want us to redirect to?
+        my $location = $old_response->header('Location');
+
+        # no-one *should* be returning non-absolute URLs, but if they
+        # are then we'd better cope with it.  Let's create a new URI, using
+        # our request as the base.
+        my $uri = URI->new_abs( $location, $request->uri )->as_string;
+
+        # make a new response, and save the old response in it
+        $response = $self->_make_request( HTTP::Request->new( GET => $uri ) );
+        my $end_of_chain = $response;
+        while ( $end_of_chain->previous )    # keep going till the end
+        {
+            $end_of_chain = $end_of_chain->previous;
+        }                                          #   of the chain...
+        $end_of_chain->previous($old_response);    # ...and add us to it
+    }
+
+    return $response;
 }
 
 sub import {
-  Test::WWW::Mechanize::Catalyst::Aux::import(@_);
+    Test::WWW::Mechanize::Catalyst::Aux::import(@_);
 }
 
 package Test::WWW::Mechanize::Catalyst::Aux;
 
 sub import {
-  my($class, $name) = @_;
-  eval "use Catalyst::Test '$name'";
-  warn $@ if $@;
+    my ( $class, $name ) = @_;
+    eval "use Catalyst::Test '$name'";
+    warn $@ if $@;
 }
 
 1;
@@ -104,6 +115,13 @@ This module supports cookies automatically.
 
 To use this module you must pass it the name of the application. See
 the SYNOPSIS above.
+
+Note that Catalyst has a special developing feature: the debug
+screen. By default this module will treat responses which are the
+debug screen as failures. If you actually want to test debug screens,
+please use:
+
+  $m->{catalyst_debug} = 1;
 
 =head1 CONSTRUCTOR
 

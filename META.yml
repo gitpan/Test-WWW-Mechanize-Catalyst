@@ -1,8 +1,13 @@
---- #YAML:1.0
-name: Test-WWW-Mechanize-Catalyst
-version: 0.35
-author:
-  - Leon Brocard, C<< <acme@astray.com> >>
-abstract: Test::WWW::Mechanize for Catalyst
-license: perl
-generated_by: Module::Build version 0.2611, without YAML.pm
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Test-WWW-Mechanize-Catalyst
+version:      0.36
+version_from: lib/Test/WWW/Mechanize/Catalyst.pm
+installdirs:  site
+requires:
+    Catalyst:                      5.00
+    Test::More:                    0
+    Test::WWW::Mechanize:          1.04
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30
