@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::WWW::Mechanize;
 use base qw(Test::WWW::Mechanize);
-our $VERSION = "0.36";
+our $VERSION = "0.37";
 
 # the reason for the auxiliary package is that both WWW::Mechanize and
 # Catalyst::Test have a subroutine named 'request'
@@ -25,9 +25,10 @@ sub _make_request {
         $response->content_type('');
     }
 
-    # check if that was a redirect.  These codes based off of
-    # http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-    if ( grep { $response->code() == $_ } 301, 302, 307 ) {
+    # check if that was a redirect
+    if (   $response->header('Location')
+        && $self->redirect_ok( $request, $response ) )
+    {
 
         # remember the old response
         my $old_response = $response;
@@ -123,6 +124,8 @@ please use:
 
   $m->{catalyst_debug} = 1;
 
+An alternative to this module is L<Catalyst::Test>.
+
 =head1 CONSTRUCTOR
 
 =head2 new
@@ -139,8 +142,8 @@ need to pass the name of the Catalyst application to the "use":
 =head2 $mech->get_ok($url, [ \%LWP_options ,] $desc)
 
 A wrapper around WWW::Mechanize's get(), with similar options, except the
-second argument needs to be a hash reference, not a hash. Like WWW::Mechanize's
-get(), it returns an HTTP::Response object.
+second argument needs to be a hash reference, not a hash. Returns true or 
+false.
 
 =head2 $mech->title_is( $str [, $desc ] )
 

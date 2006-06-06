@@ -47,6 +47,8 @@ DESCRIPTION
 
       $m->{catalyst_debug} = 1;
 
+    An alternative to this module is Catalyst::Test.
+
 CONSTRUCTOR
   new
     Behaves like, and calls, WWW::Mechanize's "new" method. Any parms passed
@@ -59,8 +61,8 @@ CONSTRUCTOR
 METHODS
   $mech->get_ok($url, [ \%LWP_options ,] $desc)
     A wrapper around WWW::Mechanize's get(), with similar options, except
-    the second argument needs to be a hash reference, not a hash. Like
-    WWW::Mechanize's get(), it returns an HTTP::Response object.
+    the second argument needs to be a hash reference, not a hash. Returns
+    true or false.
 
   $mech->title_is( $str [, $desc ] )
     Tells if the title of the page is the given string.

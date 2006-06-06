@@ -1,5 +1,10 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.37 Wed Apr 26 09:30:26 EDT 2006
+     - patch to follow LWP's $m->requests_redirectable() and small
+       docpatch (thanks to Daniel McBrearty)
+     - mention Catalyst::Test (thanks to guest)
+
 0.36 Mon Apr 17 11:27:17 BST 2006
      - perltidy
      - Catalyst debug screens are now failures (thanks to Kieren Diment)
