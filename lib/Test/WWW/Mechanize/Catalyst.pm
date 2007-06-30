@@ -1,9 +1,12 @@
 package Test::WWW::Mechanize::Catalyst;
 use strict;
 use warnings;
+use Encode qw();
+use HTML::Entities;
 use Test::WWW::Mechanize;
 use base qw(Test::WWW::Mechanize);
-our $VERSION = "0.37";
+our $VERSION = "0.38";
+my $Test = Test::Builder->new();
 
 # the reason for the auxiliary package is that both WWW::Mechanize and
 # Catalyst::Test have a subroutine named 'request'
@@ -11,6 +14,15 @@ our $VERSION = "0.37";
 sub _make_request {
     my ( $self, $request ) = @_;
     $self->cookie_jar->add_cookie_header($request) if $self->cookie_jar;
+
+    $request->authorization_basic(
+        LWP::UserAgent->get_basic_credentials(
+            undef, "Basic", $request->uri
+        )
+        )
+        if LWP::UserAgent->get_basic_credentials( undef, "Basic",
+        $request->uri );
+
     my $response = Test::WWW::Mechanize::Catalyst::Aux::request($request);
     $response->header( 'Content-Base', $request->uri );
     $response->request($request);
@@ -21,6 +33,11 @@ sub _make_request {
         && $response->code == 500
         && $response->content =~ /on Catalyst \d+\.\d+/ )
     {
+        my ($error)
+            = ( $response->content =~ /<code class="error">(.*?)<\/code>/s );
+        $error ||= "unknown error";
+        decode_entities($error);
+        $Test->diag("Catalyst error screen: $error");
         $response->content('');
         $response->content_type('');
     }
@@ -49,6 +66,13 @@ sub _make_request {
             $end_of_chain = $end_of_chain->previous;
         }                                          #   of the chain...
         $end_of_chain->previous($old_response);    # ...and add us to it
+    } else {
+        $response->{_raw_content} = $response->content;
+        if (   $response->header('Content-Type')
+            && $response->header('Content-Type') =~ m/charset=(\S+)/xms )
+        {
+            $response->content( Encode::decode( $1, $response->content ) );
+        }
     }
 
     return $response;
@@ -81,7 +105,7 @@ Test::WWW::Mechanize::Catalyst - Test::WWW::Mechanize for Catalyst
   use Test::WWW::Mechanize::Catalyst 'Catty';
 
   my $mech = Test::WWW::Mechanize::Catalyst->new;
-  $mech->get_ok("http://localhost/");
+  $mech->get_ok("/"); # no hostname needed
   is($mech->ct, "text/html");
   $mech->title_is("Root", "On the root page");
   $mech->content_contains("This is the root page", "Correct content");
@@ -102,8 +126,21 @@ requests to it. This module allows you to test L<Catalyst> web
 applications but does not start a server or issue HTTP
 requests. Instead, it passes the HTTP request object directly to
 L<Catalyst>. Thus you do not need to use a real hostname:
-"http://localhost/" will do.
+"http://localhost/" will do. However, this is optional. The following
+two lines of code do exactly the same thing:
 
+  $mech->get_ok('/action');
+  $mech->get_ok('http://localhost/action');
+
+You can also test a remote server by setting the environment variable
+CATALYST_SERVER, for example:
+
+  $ CATALYST_SERVER=http://example.com/myapp prove -l t
+
+will run the same tests on the application running at
+http://example.com/myapp regardless of whether or not you specify
+http:://localhost for Test::WWW::Mechanize::Catalyst.    
+    
 This makes testing fast and easy. L<Test::WWW::Mechanize> provides
 functions for common web testing scenarios. For example:
 
@@ -297,3 +334,4 @@ Copyright (C) 2005, Leon Brocard
 
 This module is free software; you can redistribute it or modify it
 under the same terms as Perl itself.
+

@@ -6,6 +6,7 @@ MANIFEST			This list of files
 META.yml
 README
 t/lib/Catty.pm
+t/auth-test.t
 t/pod.t
 t/pod_coverage.t
 t/simple.t

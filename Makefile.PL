@@ -7,7 +7,8 @@ WriteMakefile
           'PREREQ_PM' => {
                            'Catalyst' => '5.00',
                            'Test::More' => '0',
-                           'Test::WWW::Mechanize' => '1.04'
+                           'Test::WWW::Mechanize' => '1.14',
+                           'WWW::Mechanize' => '1.30'
                          },
           'INSTALLDIRS' => 'site',
           'PL_FILES' => {}
