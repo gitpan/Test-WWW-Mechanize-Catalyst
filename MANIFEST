@@ -1,4 +1,3 @@
-Build.PL
 CHANGES
 lib/Test/WWW/Mechanize/Catalyst.pm
 Makefile.PL

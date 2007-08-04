@@ -1,5 +1,9 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.39 Sat Aug  4 08:01:38 BST 2007
+     - external requests are now allowed (patch by Edmund von der Burg)
+     - remove Build.PL
+
 0.38 Sat Jun 30 14:07:24 BST 2007
      - document and test that you can use URLs without schema
        or hostname
