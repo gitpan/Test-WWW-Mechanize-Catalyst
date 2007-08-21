@@ -3,13 +3,14 @@ use strict;
 use warnings;
 use lib 'lib';
 use Encode qw();
-use Test::More tests => 31;
+use Test::More tests => 35;
 use lib 't/lib';
 use Test::WWW::Mechanize::Catalyst 'Catty';
 
 my $root = "http://localhost";
 
-my $m = Test::WWW::Mechanize::Catalyst->new;
+my $m = Test::WWW::Mechanize::Catalyst->new();
+
 $m->get_ok("$root/");
 is( $m->ct, "text/html" );
 $m->title_is("Root");
@@ -26,6 +27,11 @@ $m->content_contains( Encode::decode( 'utf-8', "Hi there! ☺" ) );
 #exit;
 
 $m->get_ok("/");
+is( $m->ct, "text/html" );
+$m->title_is("Root");
+$m->content_contains( "This is the root page" );
+
+$m->get_ok("http://example.com/");
 is( $m->ct, "text/html" );
 $m->title_is("Root");
 $m->content_contains( "This is the root page" );

@@ -5,20 +5,28 @@ use Encode qw();
 use HTML::Entities;
 use Test::WWW::Mechanize;
 use base qw(Test::WWW::Mechanize);
-our $VERSION = "0.39";
+our $VERSION = "0.40";
 my $Test = Test::Builder->new();
 
 # the reason for the auxiliary package is that both WWW::Mechanize and
 # Catalyst::Test have a subroutine named 'request'
 
+sub allow_external {
+    my ( $self, $value ) = @_;
+    return $self->{allow_external} unless defined $value;
+    $self->{allow_external} = $value;
+}
+
 sub _make_request {
     my ( $self, $request ) = @_;
     $self->cookie_jar->add_cookie_header($request) if $self->cookie_jar;
 
-    unless ( $request->uri->as_string =~ m{^/}
-        || $request->uri->host eq 'localhost' )
-    {
-        return $self->SUPER::_make_request($request);
+    if ( $self->{allow_external} ) {
+        unless ( $request->uri->as_string =~ m{^/}
+            || $request->uri->host eq 'localhost' )
+        {
+            return $self->SUPER::_make_request($request);
+        }
     }
 
     $request->authorization_basic(
@@ -138,9 +146,11 @@ two lines of code do exactly the same thing:
   $mech->get_ok('/action');
   $mech->get_ok('http://localhost/action');
 
-Links which do not begin with / or are not for localhost are handled
+Links which do not begin with / or are not for localhost can be handled
 as normal Web requests - this is handy if you have an external 
-single sign-on system.
+single sign-on system. You must set allow_external to true for this:
+
+  $m->allow_external(1);
 
 You can also test a remote server by setting the environment variable
 CATALYST_SERVER, for example:
@@ -185,6 +195,14 @@ need to pass the name of the Catalyst application to the "use":
   my $mech = Test::WWW::Mechanize::Catalyst->new;
 
 =head1 METHODS
+
+=head2 allow_external
+
+Links which do not begin with / or are not for localhost can be handled
+as normal Web requests - this is handy if you have an external 
+single sign-on system. You must set allow_external to true for this:
+
+  $m->allow_external(1);
 
 =head2 $mech->get_ok($url, [ \%LWP_options ,] $desc)
 
