@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use lib 'lib';
 use Encode qw();
-use Test::More tests => 35;
+use Test::More tests => 39;
 use lib 't/lib';
 use Test::WWW::Mechanize::Catalyst 'Catty';
 
@@ -29,17 +29,26 @@ $m->content_contains( Encode::decode( 'utf-8', "Hi there! ☺" ) );
 $m->get_ok("/");
 is( $m->ct, "text/html" );
 $m->title_is("Root");
-$m->content_contains( "This is the root page" );
+$m->content_contains("This is the root page");
 
 $m->get_ok("http://example.com/");
 is( $m->ct, "text/html" );
 $m->title_is("Root");
-$m->content_contains( "This is the root page" );
+$m->content_contains("This is the root page");
 
 $m->get_ok("/hello/");
 is( $m->ct, "text/html" );
 $m->title_is("Hello");
-$m->content_contains( Encode::decode( 'utf-8', "Hi there! ☺") );
+$m->content_contains( Encode::decode( 'utf-8', "Hi there! ☺" ) );
+
+SKIP: {
+    eval { require Compress::Zlib; };
+    skip "Compress::Zlib needed to test gzip encoding", 4 if $@;
+    $m->get_ok("/gzipped/");
+    is( $m->ct, "text/html" );
+    $m->title_is("Hello");
+    $m->content_contains( Encode::decode( 'utf-8', "Hi there! ☺" ) );
+}
 
 $m->get("$root/die/");
 is( $m->status, 500 );

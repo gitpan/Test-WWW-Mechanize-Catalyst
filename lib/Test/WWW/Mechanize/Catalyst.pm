@@ -5,7 +5,7 @@ use Encode qw();
 use HTML::Entities;
 use Test::WWW::Mechanize;
 use base qw(Test::WWW::Mechanize);
-our $VERSION = "0.40";
+our $VERSION = "0.41";
 my $Test = Test::Builder->new();
 
 # the reason for the auxiliary package is that both WWW::Mechanize and
@@ -82,11 +82,10 @@ sub _make_request {
         $end_of_chain->previous($old_response);    # ...and add us to it
     } else {
         $response->{_raw_content} = $response->content;
-        if (   $response->header('Content-Type')
-            && $response->header('Content-Type') =~ m/charset=(\S+)/xms )
-        {
-            $response->content( Encode::decode( $1, $response->content ) );
-        }
+
+     # For some reason Test::WWW::Mechanize uses $response->content everywhere
+     # instead of $response->decoded_content;
+        $response->content( $response->decoded_content );
     }
 
     return $response;

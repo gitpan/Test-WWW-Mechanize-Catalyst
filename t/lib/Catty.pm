@@ -94,5 +94,19 @@ $body
 };
 }
 
+sub gzipped : Global {
+    my ( $self, $c ) = @_;
+
+  # If done properly this test should check the accept-encoding header, but we
+  # control both ends, so just always gzip the response.
+    require Compress::Zlib;
+
+    my $html = html( "Hello", "Hi there! ☺" );
+    $c->response->content_type("text/html; charset=utf-8");
+    $c->response->output( Compress::Zlib::memGzip($html) );
+    $c->response->content_encoding('gzip');
+    $c->response->headers->push_header( 'Vary', 'Accept-Encoding' );
+}
+
 1;
 

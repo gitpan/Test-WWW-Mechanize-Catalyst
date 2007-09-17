@@ -11,7 +11,7 @@ WriteMakefile(
         'Test::More'           => '0',
         'WWW::Mechanize'       => '1.30',
         'Catalyst'             => '5.00',
-        'Test::WWW::Mechanize' => '1.14'
+        'Test::WWW::Mechanize' => '1.14',
     },
 );
 
