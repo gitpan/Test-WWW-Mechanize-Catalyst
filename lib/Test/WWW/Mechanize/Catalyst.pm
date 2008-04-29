@@ -5,7 +5,7 @@ use Encode qw();
 use HTML::Entities;
 use Test::WWW::Mechanize;
 use base qw(Test::WWW::Mechanize);
-our $VERSION = "0.41";
+our $VERSION = '0.42';
 my $Test = Test::Builder->new();
 
 # the reason for the auxiliary package is that both WWW::Mechanize and
@@ -40,10 +40,14 @@ sub _make_request {
     my $response = Test::WWW::Mechanize::Catalyst::Aux::request($request);
     $response->header( 'Content-Base', $request->uri );
     $response->request($request);
+    if ( $request->uri->as_string =~ m{^/} ) {
+        $request->uri(
+            URI->new( 'http://localhost:80/' . $request->uri->as_string ) );
+    }
     $self->cookie_jar->extract_cookies($response) if $self->cookie_jar;
 
     # fail tests under the Catalyst debug screen
-    if (   !$self->{catalyst_debug}
+    if (  !$self->{catalyst_debug}
         && $response->code == 500
         && $response->content =~ /on Catalyst \d+\.\d+/ )
     {

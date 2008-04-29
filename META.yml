@@ -1,17 +1,18 @@
 --- #YAML:1.0
 name:                Test-WWW-Mechanize-Catalyst
-version:             0.41
+version:             0.42
 abstract:            ~
 license:             ~
-generated_by:        ExtUtils::MakeMaker version 6.32
+author:              
+    - Leon Brocard <acme@astray.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
 distribution_type:   module
 requires:     
     Catalyst:                      5.00
+    Test::Exception:               0
     Test::More:                    0
     Test::WWW::Mechanize:          1.14
     WWW::Mechanize:                1.30
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
-    version: 1.2
-author:
-    - Leon Brocard <acme@astray.com>
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

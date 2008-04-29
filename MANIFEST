@@ -2,13 +2,15 @@ CHANGES
 lib/Test/WWW/Mechanize/Catalyst.pm
 Makefile.PL
 MANIFEST			This list of files
-META.yml
 README
 t/lib/Catty.pm
 t/lib/ExternalCatty.pm
+t/lib/CattySession.pm
 t/auth-test.t
+t/cookies.t
 t/multi_content_type.t
 t/pod.t
 t/pod_coverage.t
 t/simple.t
 t/redirect.t
+META.yml                                 Module meta-data (added by MakeMaker)

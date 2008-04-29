@@ -1,5 +1,12 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.42 Tue Apr 29 20:25:06 BST 2008
+     - stop multi_content_type.t killing smoke testing
+       (patch by Andreas König)
+     - fix a case where HTTP::Cookies dies when trying to 
+       extract_cookies (patch by Andreas Marienborg)
+     - add Test::Exception as a prerequisite
+
 0.41 Mon Sep 17 20:28:59 BST 2007
      - fix to cope with gzipped content and the test from the 
        rt.cpan queue about multiple content types

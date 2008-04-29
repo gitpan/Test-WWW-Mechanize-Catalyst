@@ -39,7 +39,11 @@ is( $m->ct, 'text/html', 'Multi Content-Type Content-Type' );
 $m->title_is( 'Root', 'Multi Content-Type title' );
 $m->content_contains( "Hello, test \x{263A}!", 'Multi Content-Type body' );
 
-END { kill 9, $pid }
+END {
+    if ( $pid > 0 ) {
+        kill 9, $pid;
+    }
+}
 
 1;
 
