@@ -5,7 +5,7 @@ use Encode qw();
 use HTML::Entities;
 use Test::WWW::Mechanize;
 use base qw(Test::WWW::Mechanize);
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 my $Test = Test::Builder->new();
 
 # the reason for the auxiliary package is that both WWW::Mechanize and

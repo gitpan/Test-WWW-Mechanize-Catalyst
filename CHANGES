@@ -1,5 +1,9 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.43 Mon Aug 18 15:42:03 BST 2008
+     - add missing prereqs to Catalyst::Plugin::Session::State::Cookie
+       and Catalyst::Plugin::Session::Store::Dummy (thanks kd)
+
 0.42 Tue Apr 29 20:25:06 BST 2008
      - stop multi_content_type.t killing smoke testing
        (patch by Andreas König)
