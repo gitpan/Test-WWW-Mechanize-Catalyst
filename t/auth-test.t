@@ -8,7 +8,7 @@ use Test::WWW::Mechanize::Catalyst 'Catty';
 
 my $root = "http://localhost";
 
-my $m = Test::WWW::Mechanize::Catalyst->new;
+my $m = Test::WWW::Mechanize::Catalyst->new( autocheck => 0 );
 $m->credentials( 'user', 'pass' );
 
 $m->get_ok("$root/check_auth_basic/");

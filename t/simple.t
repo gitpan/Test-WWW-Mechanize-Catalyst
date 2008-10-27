@@ -9,7 +9,7 @@ use Test::WWW::Mechanize::Catalyst 'Catty';
 
 my $root = "http://localhost";
 
-my $m = Test::WWW::Mechanize::Catalyst->new();
+my $m = Test::WWW::Mechanize::Catalyst->new( autocheck => 0 );
 
 $m->get_ok("$root/");
 is( $m->ct, "text/html" );

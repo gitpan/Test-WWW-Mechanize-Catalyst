@@ -5,7 +5,7 @@ use Encode qw();
 use HTML::Entities;
 use Test::WWW::Mechanize;
 use base qw(Test::WWW::Mechanize);
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 my $Test = Test::Builder->new();
 
 # the reason for the auxiliary package is that both WWW::Mechanize and
@@ -86,10 +86,6 @@ sub _make_request {
         $end_of_chain->previous($old_response);    # ...and add us to it
     } else {
         $response->{_raw_content} = $response->content;
-
-     # For some reason Test::WWW::Mechanize uses $response->content everywhere
-     # instead of $response->decoded_content;
-        $response->content( $response->decoded_content );
     }
 
     return $response;
@@ -362,6 +358,8 @@ Leon Brocard, C<< <acme@astray.com> >>
 =head1 COPYRIGHT
 
 Copyright (C) 2005-7, Leon Brocard
+
+=head1 LICENSE
 
 This module is free software; you can redistribute it or modify it
 under the same terms as Perl itself.

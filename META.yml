@@ -1,8 +1,8 @@
 --- #YAML:1.0
 name:                Test-WWW-Mechanize-Catalyst
-version:             0.43
-abstract:            ~
-license:             ~
+version:             0.44
+abstract:            Test::WWW::Mechanize for Catalyst
+license:             perl
 author:              
     - Leon Brocard <acme@astray.com>
 generated_by:        ExtUtils::MakeMaker version 6.44
@@ -11,10 +11,11 @@ requires:
     Catalyst:                      5.00
     Catalyst::Plugin::Session::State::Cookie: 0
     Catalyst::Plugin::Session::Store::Dummy: 0
+    LWP:                           5.816
     Test::Exception:               0
     Test::More:                    0
     Test::WWW::Mechanize:          1.14
-    WWW::Mechanize:                1.30
+    WWW::Mechanize:                1.50
 meta-spec:
     url:     http://module-build.sourceforge.net/META-spec-v1.3.html
     version: 1.3

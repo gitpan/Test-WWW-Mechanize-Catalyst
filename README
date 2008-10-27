@@ -7,7 +7,7 @@ SYNOPSIS
       use Test::WWW::Mechanize::Catalyst 'Catty';
 
       my $mech = Test::WWW::Mechanize::Catalyst->new;
-      $mech->get_ok("http://localhost/");
+      $mech->get_ok("/"); # no hostname needed
       is($mech->ct, "text/html");
       $mech->title_is("Root", "On the root page");
       $mech->content_contains("This is the root page", "Correct content");
@@ -26,7 +26,26 @@ DESCRIPTION
     This module allows you to test Catalyst web applications but does not
     start a server or issue HTTP requests. Instead, it passes the HTTP
     request object directly to Catalyst. Thus you do not need to use a real
-    hostname: "http://localhost/" will do.
+    hostname: "http://localhost/" will do. However, this is optional. The
+    following two lines of code do exactly the same thing:
+
+      $mech->get_ok('/action');
+      $mech->get_ok('http://localhost/action');
+
+    Links which do not begin with / or are not for localhost can be handled
+    as normal Web requests - this is handy if you have an external single
+    sign-on system. You must set allow_external to true for this:
+
+      $m->allow_external(1);
+
+    You can also test a remote server by setting the environment variable
+    CATALYST_SERVER, for example:
+
+      $ CATALYST_SERVER=http://example.com/myapp prove -l t
+
+    will run the same tests on the application running at
+    http://example.com/myapp regardless of whether or not you specify
+    http:://localhost for Test::WWW::Mechanize::Catalyst.
 
     This makes testing fast and easy. Test::WWW::Mechanize provides
     functions for common web testing scenarios. For example:
@@ -59,6 +78,13 @@ CONSTRUCTOR
       my $mech = Test::WWW::Mechanize::Catalyst->new;
 
 METHODS
+  allow_external
+    Links which do not begin with / or are not for localhost can be handled
+    as normal Web requests - this is handy if you have an external single
+    sign-on system. You must set allow_external to true for this:
+
+      $m->allow_external(1);
+
   $mech->get_ok($url, [ \%LWP_options ,] $desc)
     A wrapper around WWW::Mechanize's get(), with similar options, except
     the second argument needs to be a hash reference, not a hash. Returns
@@ -190,8 +216,9 @@ AUTHOR
     Leon Brocard, "<acme@astray.com>"
 
 COPYRIGHT
-    Copyright (C) 2005, Leon Brocard
+    Copyright (C) 2005-7, Leon Brocard
 
+LICENSE
     This module is free software; you can redistribute it or modify it under
     the same terms as Perl itself.
 
