@@ -5,7 +5,7 @@ use Encode qw();
 use HTML::Entities;
 use Test::WWW::Mechanize;
 use base qw(Test::WWW::Mechanize);
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 my $Test = Test::Builder->new();
 
 # the reason for the auxiliary package is that both WWW::Mechanize and
@@ -98,8 +98,11 @@ sub import {
 package Test::WWW::Mechanize::Catalyst::Aux;
 
 sub import {
-    my ( $class, $name ) = @_;
-    eval "use Catalyst::Test '$name'";
+    my ( $class, @args ) = @_;
+    eval {
+        require Catalyst::Test;
+        Catalyst::Test::import(@_);
+    };
     warn $@ if $@;
 }
 

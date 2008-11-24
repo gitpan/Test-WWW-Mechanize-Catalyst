@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Test-WWW-Mechanize-Catalyst
-version:             0.44
+version:             0.45
 abstract:            Test::WWW::Mechanize for Catalyst
 license:             perl
 author:              

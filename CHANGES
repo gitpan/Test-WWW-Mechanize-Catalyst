@@ -1,5 +1,9 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.45 Mon Nov 24 20:39:19 GMT 2008
+     - be forwards-compatible with Catalyst 5.80's virtual 
+       domain testing (thanks Jason Gottshall)
+
 0.44 Mon Oct 27 13:48:22 GMT 2008
      - fix longstanding bug with recent LWP, requiring 
        WWW::Mechanize 1.50 (thanks to petdance, mst, dakkar)
