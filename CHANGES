@@ -1,5 +1,18 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.50_1 Thur Feb 5 09:02 GMT 2008
+     - App classname no longer has to be passed to import:
+        $m = T::W::M::C->new(catalyst_app => 'Catty')
+       now works.
+     - Can now use TWMC two test two different apps in the same perl
+       interpreter due to the above change
+     - Removed Test::WWW::Mechanize::Catalyst::Aux package as it isn't needed
+       any more
+     - Add 'host' accessor for white-label testing
+     - Moosification
+     - Can now test against remote CATALYST_SERVER without having to load the
+       app class
+
 0.45 Mon Nov 24 20:39:19 GMT 2008
      - be forwards-compatible with Catalyst 5.80's virtual 
        domain testing (thanks Jason Gottshall)

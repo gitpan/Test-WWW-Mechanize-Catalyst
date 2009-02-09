@@ -1,23 +1,27 @@
 #!perl
+use inc::Module::Install 0.77;
+
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
 
-WriteMakefile(
-    'NAME'         => 'Test::WWW::Mechanize::Catalyst',
-    'VERSION_FROM' => 'lib/Test/WWW/Mechanize/Catalyst.pm',
-    'AUTHOR'       => 'Leon Brocard <acme@astray.com>',
-    'ABSTRACT'     => 'Test::WWW::Mechanize for Catalyst',
-    'LICENSE'      => 'perl',
-    'PREREQ_PM'    => {
-        'Catalyst'                                 => '5.00',
-        'Catalyst::Plugin::Session::State::Cookie' => '0',
-        'Catalyst::Plugin::Session::Store::Dummy'  => '0',
-        'LWP'                                      => '5.816',
-        'Test::Exception'                          => '0',
-        'Test::More'                               => '0',
-        'Test::WWW::Mechanize'                     => '1.14',
-        'WWW::Mechanize'                           => '1.50',
-    },
-);
+name 'Test-WWW-Mechanize-Catalyst';
+all_from 'lib/Test/WWW/Mechanize/Catalyst.pm';
 
+requires 'Catalyst'                                 => '5.00';
+requires 'LWP'                                      => '5.816';
+requires 'Test::WWW::Mechanize'                     => '1.14';
+requires 'WWW::Mechanize'                           => '1.50';
+requires 'Moose'                                    => '0.67';
+requires 'namespace::clean'                         => '0.09';
+
+test_requires 'Catalyst::Plugin::Session::State::Cookie' => '0';
+test_requires 'Catalyst::Plugin::Session::Store::Dummy'  => '0';
+test_requires 'Test::Exception'                          => '0';
+test_requires 'Test::More'                               => '0';
+
+if ($Module::Install::AUTHOR) {
+  system('pod2text lib/Test/WWW/Mechanize/Catalyst.pm > README');
+}
+
+
+WriteAll;

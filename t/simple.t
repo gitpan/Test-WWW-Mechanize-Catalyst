@@ -1,9 +1,9 @@
-#!perl -T
+#!perl
 use strict;
 use warnings;
-use lib 'lib';
+
 use Encode qw();
-use Test::More tests => 39;
+use Test::More tests => 37;
 use lib 't/lib';
 use Test::WWW::Mechanize::Catalyst 'Catty';
 
@@ -20,7 +20,9 @@ $m->follow_link_ok( { text => 'Hello' } );
 is( $m->base, "http://localhost/hello/" );
 is( $m->ct,   "text/html" );
 $m->title_is("Hello");
-$m->content_contains( Encode::decode( 'utf-8', "Hi there! ☺" ) );
+my $bytes = "Hi there! ☺";
+my $chars = Encode::decode( 'utf-8', $bytes );
+$m->content_contains( $chars, qq{content contains "$bytes"});
 
 #use Devel::Peek; Dump $m->content;
 #Dump(Encode::decode('utf-8', "Hi there! ☺"));
@@ -39,7 +41,7 @@ $m->content_contains("This is the root page");
 $m->get_ok("/hello/");
 is( $m->ct, "text/html" );
 $m->title_is("Hello");
-$m->content_contains( Encode::decode( 'utf-8', "Hi there! ☺" ) );
+$m->content_contains( $chars, qq{content contains "$bytes"});
 
 SKIP: {
     eval { require Compress::Zlib; };
@@ -47,27 +49,28 @@ SKIP: {
     $m->get_ok("/gzipped/");
     is( $m->ct, "text/html" );
     $m->title_is("Hello");
-    $m->content_contains( Encode::decode( 'utf-8', "Hi there! ☺" ) );
+    $m->content_contains( $chars, qq{content contains "$bytes"});
 }
 
 $m->get("$root/die/");
 is( $m->status, 500 );
-is( $m->ct,     "" );
-$m->title_is(undef);
-$m->content_is("");
+$m->content_like( qr!\(en\) Please come back later!);
+$m->content_unlike( qr!<a href="/hello/">Hello</a>.!);
 
 $m->get("/die/");
 is( $m->status, 500 );
-is( $m->ct,     "" );
-$m->title_is(undef);
-$m->content_is("");
+$m->content_like( qr!\(en\) Please come back later!);
+$m->content_unlike( qr!<a href="/hello/">Hello</a>.!);
 
-$m->{catalyst_debug} = 1;
-$m->get("$root/die/");
-is( $m->status, 500 );
-is( $m->ct,     "text/html" );
-$m->title_like(qr/Catty on Catalyst/);
-$m->content_like(qr/Caught exception in Catty/);
-$m->content_like(qr/erk/);
-$m->content_like(qr/This is the die page/);
-
+{
+  no warnings 'redefine';
+  ${Catty::}{debug} = sub { 1 };
+  $m->{catalyst_debug} = 1;
+  $m->get("$root/die/");
+  is( $m->status, 500 );
+  is( $m->ct,     "text/html" );
+  $m->title_like(qr/Catty on Catalyst/);
+  $m->content_like(qr/Caught exception in Catty/);
+  $m->content_like(qr/erk/);
+  $m->content_like(qr/This is the die page/);
+}

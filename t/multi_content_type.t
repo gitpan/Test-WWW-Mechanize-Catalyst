@@ -15,7 +15,7 @@ use Test::Exception;
 
 BEGIN {
     diag(
-        "###################################################################\n",
+        "\n###################################################################\n",
         "Starting an external Catalyst HTTP server on port $PORT\n",
         "To change the port, please set the TWMC_TEST_PORT env variable.\n",
         "(The server will be automatically shut-down right after the tests).\n",
@@ -29,7 +29,7 @@ $SIG{INT} = sub { warn "INT:$$"; exit };
 use_ok 'ExternalCatty';
 my $pid = ExternalCatty->background($PORT);
 
-use Test::WWW::Mechanize::Catalyst 'ExternalCatty';
+use Test::WWW::Mechanize::Catalyst;
 my $m = Test::WWW::Mechanize::Catalyst->new;
 
 lives_ok { $m->get_ok( '/', 'Get a multi Content-Type response' ) }

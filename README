@@ -3,16 +3,21 @@ NAME
 
 SYNOPSIS
       # We're in a t/*.t test script...
-      # To test a Catalyst application named 'Catty':
-      use Test::WWW::Mechanize::Catalyst 'Catty';
+      use Test::WWW::Mechanize::Catalyst;
 
-      my $mech = Test::WWW::Mechanize::Catalyst->new;
+      # To test a Catalyst application named 'Catty':
+      my $mech = Test::WWW::Mechanize::Catalyst->new(catalyst_app => 'Catty');
+
       $mech->get_ok("/"); # no hostname needed
       is($mech->ct, "text/html");
       $mech->title_is("Root", "On the root page");
       $mech->content_contains("This is the root page", "Correct content");
       $mech->follow_link_ok({text => 'Hello'}, "Click on Hello");
       # ... and all other Test::WWW::Mechanize methods
+      
+  # White label site testing
+      $mech->host("foo.com");
+      $mech->get_ok("/");
 
 DESCRIPTION
     Catalyst is an elegant MVC Web Application Framework.
@@ -84,6 +89,21 @@ METHODS
     sign-on system. You must set allow_external to true for this:
 
       $m->allow_external(1);
+
+    head2 catalyst_app
+
+    The name of the Catalyst app which we are testing against. Read-only.
+
+  host
+    The host value to set the "Host:" HTTP header to, if none is present
+    already in the request. If not set (default) then Catalyst::Test will
+    set this to localhost:80
+
+  clear_host
+    Unset the host attribute.
+
+  has_host
+    Do we have a value set for the host attribute
 
   $mech->get_ok($url, [ \%LWP_options ,] $desc)
     A wrapper around WWW::Mechanize's get(), with similar options, except
@@ -213,10 +233,12 @@ SEE ALSO
     Test::WWW::Mechanize, WWW::Mechanize.
 
 AUTHOR
-    Leon Brocard, "<acme@astray.com>"
+    Ash Berlin "<ash@cpan.org>" (current maintiner)
+
+    Original Author: Leon Brocard, "<acme@astray.com>"
 
 COPYRIGHT
-    Copyright (C) 2005-7, Leon Brocard
+    Copyright (C) 2005-8, Leon Brocard
 
 LICENSE
     This module is free software; you can redistribute it or modify it under

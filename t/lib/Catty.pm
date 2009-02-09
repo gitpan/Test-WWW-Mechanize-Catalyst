@@ -3,9 +3,10 @@ package Catty;
 use strict;
 
 #use Catalyst;
-use Catalyst qw/-Debug/;
+use Catalyst;
 use Cwd;
 use MIME::Base64;
+use Encode qw//;
 
 our $VERSION = '0.01';
 
@@ -13,8 +14,8 @@ Catty->config(
     name => 'Catty',
     root => cwd . '/t/root',
 );
-
 Catty->setup();
+Catty->log->levels("fatal");
 
 sub default : Private {
     my ( $self, $context ) = @_;
@@ -25,7 +26,8 @@ sub default : Private {
 
 sub hello : Global {
     my ( $self, $context ) = @_;
-    my $html = html( "Hello", "Hi there! ☺" );
+    my $str = Encode::encode('utf-8', "\x{263A}"); # ☺
+    my $html = html( "Hello", "Hi there! $str" );
     $context->response->content_type("text/html; charset=utf-8");
     $context->response->output($html);
 }
@@ -80,6 +82,23 @@ sub die : Global {
     $context->response->content_type("text/html");
     $context->response->output($html);
     die "erk!";
+}
+
+sub name : Global {
+    my ($self, $c) = @_;
+
+    my $html = html( $c->config->{name}, "This is the die page" );
+    $c->response->content_type("text/html");
+    $c->response->output($html);
+}
+
+sub host : Global {
+    my ($self, $c) = @_;
+
+    my $host = $c->req->header('Host') || "<undef>";
+    my $html = html( $c->config->{name}, "Host: $host" );
+    $c->response->content_type("text/html");
+    $c->response->output($html);
 }
 
 sub html {

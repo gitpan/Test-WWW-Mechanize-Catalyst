@@ -1,43 +1,63 @@
 package Test::WWW::Mechanize::Catalyst;
-use strict;
-use warnings;
+
+use Moose;
+
+use Carp qw/croak/;
+require Catalyst::Test; # Do not call import
 use Encode qw();
 use HTML::Entities;
 use Test::WWW::Mechanize;
-use base qw(Test::WWW::Mechanize);
-our $VERSION = '0.45';
+
+extends 'Test::WWW::Mechanize', 'Moose::Object';
+
+use namespace::clean -execept => 'meta';
+
+our $VERSION = '0.50_1';
+our $APP_CLASS;
 my $Test = Test::Builder->new();
 
-# the reason for the auxiliary package is that both WWW::Mechanize and
-# Catalyst::Test have a subroutine named 'request'
+has catalyst_app => (
+  is => 'ro',
+  predicate => 'has_catalyst_app',
+);
 
-sub allow_external {
-    my ( $self, $value ) = @_;
-    return $self->{allow_external} unless defined $value;
-    $self->{allow_external} = $value;
+has allow_external => (
+  is => 'rw',
+  isa => 'Bool',
+  default => 0
+);
+
+has host => (
+  is => 'rw',
+  isa => 'Str',
+  clearer => 'clear_host',
+  predicate => 'has_host',
+);
+
+sub new {
+  my $class = shift;
+
+  my $obj = $class->SUPER::new(@_);
+  my $self = $class->meta->new_object(
+    __INSTANCE__ => $obj,
+    ($APP_CLASS ? (catalyst_app => $APP_CLASS) : () ),
+    @_
+  );
+
+  unless ($ENV{CATALYST_SERVER}) {
+    croak "catalyst_app attribute is required unless CATALYST_SERVER env variable is set"
+      unless $self->has_catalyst_app;
+    Class::MOP::load_class($self->catalyst_app)
+      unless (Class::MOP::is_class_loaded($self->catalyst_app));
+  }
+
+  return $self;
 }
 
 sub _make_request {
     my ( $self, $request ) = @_;
-    $self->cookie_jar->add_cookie_header($request) if $self->cookie_jar;
 
-    if ( $self->{allow_external} ) {
-        unless ( $request->uri->as_string =~ m{^/}
-            || $request->uri->host eq 'localhost' )
-        {
-            return $self->SUPER::_make_request($request);
-        }
-    }
-
-    $request->authorization_basic(
-        LWP::UserAgent->get_basic_credentials(
-            undef, "Basic", $request->uri
-        )
-        )
-        if LWP::UserAgent->get_basic_credentials( undef, "Basic",
-        $request->uri );
-
-    my $response = Test::WWW::Mechanize::Catalyst::Aux::request($request);
+    my $response = $self->_do_catalyst_request($request);
     $response->header( 'Content-Base', $request->uri );
     $response->request($request);
     if ( $request->uri->as_string =~ m{^/} ) {
@@ -91,20 +111,56 @@ sub _make_request {
     return $response;
 }
 
-sub import {
-    Test::WWW::Mechanize::Catalyst::Aux::import(@_);
+sub _do_catalyst_request {
+    my ($self, $request) = @_;
+
+    $self->cookie_jar->add_cookie_header($request) if $self->cookie_jar;
+
+    # Woe betide anyone who unsets CATALYST_SERVER
+    return Catalyst::Test::remote_request($request)
+      if $ENV{CATALYST_SERVER};
+
+    my $uri = $request->uri;
+    if ($uri->as_string =~ m{^/}) {
+      $uri->scheme('http');
+      $uri->host('localhost');
+    }
+
+
+    # If there's no Host header, set one.
+    unless ($request->header('Host')) {
+      my $host = $self->has_host
+               ? $self->host
+               : $uri->host;
+
+      $request->header('Host', $host);
+    }
+  
+    if ( $self->{allow_external} ) {
+        unless ( $request->uri->as_string =~ m{^/}
+            || $request->uri->host eq 'localhost' )
+        {
+            return $self->SUPER::_make_request($request);
+        }
+    }
+  
+    my @creds = $self->get_basic_credentials( "Basic", $uri );
+    $request->authorization_basic( @creds ) if @creds;
+
+    return Catalyst::Test::local_request($self->{catalyst_app}, $request);
 }
 
-package Test::WWW::Mechanize::Catalyst::Aux;
-
 sub import {
-    my ( $class, @args ) = @_;
-    eval {
-        require Catalyst::Test;
-        Catalyst::Test::import(@_);
-    };
-    warn $@ if $@;
+  my ($class, $app) = @_;
+
+  if (defined $app) {
+    Class::MOP::load_class($app)
+      unless (Class::MOP::is_class_loaded($app));
+    $APP_CLASS = $app; 
+  }
+
 }
+
 
 1;
 
@@ -117,16 +173,21 @@ Test::WWW::Mechanize::Catalyst - Test::WWW::Mechanize for Catalyst
 =head1 SYNOPSIS
 
   # We're in a t/*.t test script...
-  # To test a Catalyst application named 'Catty':
-  use Test::WWW::Mechanize::Catalyst 'Catty';
+  use Test::WWW::Mechanize::Catalyst;
 
-  my $mech = Test::WWW::Mechanize::Catalyst->new;
+  # To test a Catalyst application named 'Catty':
+  my $mech = Test::WWW::Mechanize::Catalyst->new(catalyst_app => 'Catty');
+
   $mech->get_ok("/"); # no hostname needed
   is($mech->ct, "text/html");
   $mech->title_is("Root", "On the root page");
   $mech->content_contains("This is the root page", "Correct content");
   $mech->follow_link_ok({text => 'Hello'}, "Click on Hello");
   # ... and all other Test::WWW::Mechanize methods
+  
+  # White label site testing
+  $mech->host("foo.com");
+  $mech->get_ok("/");
 
 =head1 DESCRIPTION
 
@@ -205,6 +266,24 @@ as normal Web requests - this is handy if you have an external
 single sign-on system. You must set allow_external to true for this:
 
   $m->allow_external(1);
+
+head2 catalyst_app
+
+The name of the Catalyst app which we are testing against. Read-only.
+
+=head2 host
+
+The host value to set the "Host:" HTTP header to, if none is present already in
+the request. If not set (default) then Catalyst::Test will set this to
+localhost:80
+
+=head2 clear_host
+
+Unset the host attribute.
+
+=head2 has_host
+
+Do we have a value set for the host attribute
 
 =head2 $mech->get_ok($url, [ \%LWP_options ,] $desc)
 
@@ -356,11 +435,13 @@ L<Test::WWW::Mechanize>, L<WWW::Mechanize>.
 
 =head1 AUTHOR
 
-Leon Brocard, C<< <acme@astray.com> >>
+Ash Berlin C<< <ash@cpan.org> >> (current maintiner)
+
+Original Author: Leon Brocard, C<< <acme@astray.com> >>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005-7, Leon Brocard
+Copyright (C) 2005-8, Leon Brocard
 
 =head1 LICENSE
 

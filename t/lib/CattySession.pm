@@ -3,7 +3,7 @@ package CattySession;
 use strict;
 
 #use Catalyst;
-use Catalyst qw/-Debug
+use Catalyst qw/
     Session
     Session::State::Cookie
     Session::Store::Dummy
@@ -34,6 +34,15 @@ sub default : Private {
     $context->response->content_type("text/html");
     $context->response->output($html);
 }
+
+sub name : Global {
+    my ($self, $c) = @_;
+
+    my $html = html( $c->config->{name}, "This is the die page" );
+    $c->response->content_type("text/html");
+    $c->response->output($html);
+}
+
 
 sub html {
     my ( $title, $body ) = @_;

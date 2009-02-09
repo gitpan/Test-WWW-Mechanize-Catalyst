@@ -1,16 +1,26 @@
 CHANGES
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
 lib/Test/WWW/Mechanize/Catalyst.pm
 Makefile.PL
 MANIFEST			This list of files
+META.yml
 README
-t/lib/Catty.pm
-t/lib/ExternalCatty.pm
-t/lib/CattySession.pm
 t/auth-test.t
 t/cookies.t
+t/lib/Catty.pm
+t/lib/CattySession.pm
+t/lib/ExternalCatty.pm
 t/multi_content_type.t
 t/pod.t
 t/pod_coverage.t
-t/simple.t
 t/redirect.t
-META.yml                                 Module meta-data (added by MakeMaker)
+t/simple.t
+t/two_app.t
+t/white_label.t
