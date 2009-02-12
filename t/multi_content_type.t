@@ -32,15 +32,27 @@ my $pid = ExternalCatty->background($PORT);
 use Test::WWW::Mechanize::Catalyst;
 my $m = Test::WWW::Mechanize::Catalyst->new;
 
-lives_ok { $m->get_ok( '/', 'Get a multi Content-Type response' ) }
-'Survive to a multi Content-Type sting';
+my $skip = 0;
+TRY_CONNECT: {
+  eval { $m->get('/') };
 
-is( $m->ct, 'text/html', 'Multi Content-Type Content-Type' );
-$m->title_is( 'Root', 'Multi Content-Type title' );
-$m->content_contains( "Hello, test \x{263A}!", 'Multi Content-Type body' );
+  if ($@ || $m->content =~ /\(connect: Connection refused\)/) {
+    $skip = $@ || $m->content;
+  }
+}
+
+SKIP: {
+  skip $skip, 5 if $skip;
+  lives_ok { $m->get_ok( '/', 'Get a multi Content-Type response' ) }
+  'Survive to a multi Content-Type sting';
+
+  is( $m->ct, 'text/html', 'Multi Content-Type Content-Type' );
+  $m->title_is( 'Root', 'Multi Content-Type title' );
+  $m->content_contains( "Hello, test \x{263A}!", 'Multi Content-Type body' );
+}
 
 END {
-    if ( $pid > 0 ) {
+    if ( $pid && $pid > 0 ) {
         kill 9, $pid;
     }
 }

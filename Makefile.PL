@@ -1,5 +1,5 @@
 #!perl
-use inc::Module::Install 0.77;
+use inc::Module::Install 0.79;
 
 use strict;
 use warnings;

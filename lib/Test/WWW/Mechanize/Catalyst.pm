@@ -12,7 +12,7 @@ extends 'Test::WWW::Mechanize', 'Moose::Object';
 
 use namespace::clean -execept => 'meta';
 
-our $VERSION = '0.50_1';
+our $VERSION = '0.50_2';
 our $APP_CLASS;
 my $Test = Test::Builder->new();
 
