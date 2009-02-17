@@ -27,4 +27,4 @@ requires:
   namespace::clean: 0.09
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.50_2
+version: 0.50

@@ -12,7 +12,7 @@ extends 'Test::WWW::Mechanize', 'Moose::Object';
 
 use namespace::clean -execept => 'meta';
 
-our $VERSION = '0.50_2';
+our $VERSION = '0.50';
 our $APP_CLASS;
 my $Test = Test::Builder->new();
 
@@ -37,12 +37,31 @@ has host => (
 sub new {
   my $class = shift;
 
-  my $obj = $class->SUPER::new(@_);
+  my $args = ref $_[0] ? $_[0] : { @_ };
+  
+  # Dont let LWP complain about options for our attributes
+  my %attr_options = map {
+    my $n = $_->init_arg;
+    defined $n && exists $args->{$n} 
+        ? ( $n => delete $args->{$n} )
+        : ( );
+  } $class->meta->get_all_attributes;
+
+  my $obj = $class->SUPER::new(%$args);
   my $self = $class->meta->new_object(
     __INSTANCE__ => $obj,
     ($APP_CLASS ? (catalyst_app => $APP_CLASS) : () ),
-    @_
+    %attr_options
   );
+
+  $self->BUILDALL;
+
+
+  return $self;
+}
+
+sub BUILD {
+  my ($self) = @_;
 
   unless ($ENV{CATALYST_SERVER}) {
     croak "catalyst_app attribute is required unless CATALYST_SERVER env variable is set"
@@ -50,8 +69,6 @@ sub new {
     Class::MOP::load_class($self->catalyst_app)
       unless (Class::MOP::is_class_loaded($self->catalyst_app));
   }
-
-  return $self;
 }
 
 sub _make_request {
@@ -114,17 +131,16 @@ sub _make_request {
 sub _do_catalyst_request {
     my ($self, $request) = @_;
 
+    my $uri = $request->uri;
+    $uri->scheme('http') unless defined $uri->scheme;
+    $uri->host('localhost') unless defined $uri->host;
+
     $self->cookie_jar->add_cookie_header($request) if $self->cookie_jar;
 
     # Woe betide anyone who unsets CATALYST_SERVER
     return Catalyst::Test::remote_request($request)
       if $ENV{CATALYST_SERVER};
 
-    my $uri = $request->uri;
-    if ($uri->as_string =~ m{^/}) {
-      $uri->scheme('http');
-      $uri->host('localhost');
-    }
 
 
     # If there's no Host header, set one.

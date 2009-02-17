@@ -1,10 +1,14 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
-0.50_2 Thur Feb 12 09:47 GMT 2008
+0.50 Tue Feb 17 09:12 GMT 2009
+     - Remove warning in HTTP::Cookies
+     - Call BUILDALL
+
+0.50_2 Thur Feb 12 09:47 GMT 2009
      - Make t/multi_content_type.t handle case when server cant be started,
        which is almost always due to port in use.
 
-0.50_1 Thur Feb 5 09:02 GMT 2008
+0.50_1 Thur Feb 5 09:02 GMT 2009
      - App classname no longer has to be passed to import:
         $m = T::W::M::C->new(catalyst_app => 'Catty')
        now works.
