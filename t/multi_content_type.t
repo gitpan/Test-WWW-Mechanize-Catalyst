@@ -10,7 +10,7 @@ BEGIN {
     $ENV{CATALYST_SERVER} ||= "http://localhost:$PORT";
 }
 
-use Test::More tests => 6;
+use Test::More tests => 8;
 use Test::Exception;
 
 BEGIN {
@@ -36,23 +36,27 @@ my $skip = 0;
 TRY_CONNECT: {
   eval { $m->get('/') };
 
-  if ($@ || $m->content =~ /\(connect: Connection refused\)/) {
+  if ($@ || $m->content =~ /Can't connect to \w+:$PORT/) {
     $skip = $@ || $m->content;
   }
 }
 
 SKIP: {
-  skip $skip, 5 if $skip;
+  skip $skip, 7 if $skip;
   lives_ok { $m->get_ok( '/', 'Get a multi Content-Type response' ) }
   'Survive to a multi Content-Type sting';
 
   is( $m->ct, 'text/html', 'Multi Content-Type Content-Type' );
   $m->title_is( 'Root', 'Multi Content-Type title' );
   $m->content_contains( "Hello, test \x{263A}!", 'Multi Content-Type body' );
+
+  # Test a redirect with a remote server now too.
+  $m->get_ok( '/hello' );
+  is($m->uri, "$ENV{CATALYST_SERVER}/");
 }
 
 END {
-    if ( $pid && $pid > 0 ) {
+    if ( $pid && $pid != 0 ) {
         kill 9, $pid;
     }
 }

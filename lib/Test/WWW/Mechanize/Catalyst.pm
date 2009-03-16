@@ -10,9 +10,9 @@ use Test::WWW::Mechanize;
 
 extends 'Test::WWW::Mechanize', 'Moose::Object';
 
-use namespace::clean -execept => 'meta';
+#use namespace::clean -execept => 'meta';
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 our $APP_CLASS;
 my $Test = Test::Builder->new();
 
@@ -75,12 +75,9 @@ sub _make_request {
     my ( $self, $request ) = @_;
 
     my $response = $self->_do_catalyst_request($request);
-    $response->header( 'Content-Base', $request->uri );
-    $response->request($request);
-    if ( $request->uri->as_string =~ m{^/} ) {
-        $request->uri(
-            URI->new( 'http://localhost:80/' . $request->uri->as_string ) );
-    }
+    $response->header( 'Content-Base', $response->request->uri )
+      unless $response->header('Content-Base');
+
     $self->cookie_jar->extract_cookies($response) if $self->cookie_jar;
 
     # fail tests under the Catalyst debug screen
@@ -99,6 +96,7 @@ sub _make_request {
 
     # check if that was a redirect
     if (   $response->header('Location')
+        && $response->is_redirect
         && $self->redirect_ok( $request, $response ) )
     {
 
@@ -135,13 +133,12 @@ sub _do_catalyst_request {
     $uri->scheme('http') unless defined $uri->scheme;
     $uri->host('localhost') unless defined $uri->host;
 
+    $request = $self->prepare_request($request);
     $self->cookie_jar->add_cookie_header($request) if $self->cookie_jar;
 
     # Woe betide anyone who unsets CATALYST_SERVER
-    return Catalyst::Test::remote_request($request)
+    return $self->_do_remote_request($request)
       if $ENV{CATALYST_SERVER};
-
-
 
     # If there's no Host header, set one.
     unless ($request->header('Host')) {
@@ -151,19 +148,74 @@ sub _do_catalyst_request {
 
       $request->header('Host', $host);
     }
-  
-    if ( $self->{allow_external} ) {
-        unless ( $request->uri->as_string =~ m{^/}
-            || $request->uri->host eq 'localhost' )
-        {
-            return $self->SUPER::_make_request($request);
-        }
-    }
-  
+ 
+    my $res = $self->_check_external_request($request);
+    return $res if $res;
+
     my @creds = $self->get_basic_credentials( "Basic", $uri );
     $request->authorization_basic( @creds ) if @creds;
 
-    return Catalyst::Test::local_request($self->{catalyst_app}, $request);
+    my $response =Catalyst::Test::local_request($self->{catalyst_app}, $request);
+
+    # LWP would normally do this, but we dont get down that far.
+    $response->request($request);
+
+    return $response
+}
+
+sub _check_external_request {
+    my ($self, $request) = @_;
+
+    # If there's no host then definatley not an external request.
+    $request->uri->can('host_port') or return;
+
+    if ( $self->allow_external && $request->uri->host_port ne 'localhost:80' ) {
+        return $self->SUPER::_make_request($request);
+    }
+    return undef;
+}
+
+sub _do_remote_request {
+    my ($self, $request) = @_;
+
+    my $res = $self->_check_external_request($request);
+    return $res if $res;
+
+    my $server  = URI->new( $ENV{CATALYST_SERVER} );
+
+    if ( $server->path =~ m|^(.+)?/$| ) {
+        my $path = $1;
+        $server->path("$path") if $path;    # need to be quoted
+    }
+
+    # the request path needs to be sanitised if $server is using a
+    # non-root path due to potential overlap between request path and
+    # response path.
+    if ($server->path) {
+        # If request path is '/', we have to add a trailing slash to the
+        # final request URI
+        my $add_trailing = $request->uri->path eq '/';
+        
+        my @sp = split '/', $server->path;
+        my @rp = split '/', $request->uri->path;
+        shift @sp;shift @rp; # leading /
+        if (@rp) {
+            foreach my $sp (@sp) {
+                $sp eq $rp[0] ? shift @rp : last
+            }
+        }
+        $request->uri->path(join '/', @rp);
+        
+        if ( $add_trailing ) {
+            $request->uri->path( $request->uri->path . '/' );
+        }
+    }
+
+    $request->uri->scheme( $server->scheme );
+    $request->uri->host( $server->host );
+    $request->uri->port( $server->port );
+    $request->uri->path( $server->path . $request->uri->path );
+    return $self->SUPER::_make_request($request);
 }
 
 sub import {
@@ -207,16 +259,16 @@ Test::WWW::Mechanize::Catalyst - Test::WWW::Mechanize for Catalyst
 
 =head1 DESCRIPTION
 
-L<Catalyst> is an elegant MVC Web Application
-Framework. L<Test::WWW::Mechanize> is a subclass of L<WWW::Mechanize> that
-incorporates features for web application testing. The
-L<Test::WWW::Mechanize::Catalyst> module meshes the two to allow easy
-testing of L<Catalyst> applications without starting up a web server.
+L<Catalyst> is an elegant MVC Web Application Framework.
+L<Test::WWW::Mechanize> is a subclass of L<WWW::Mechanize> that incorporates
+features for web application testing. The L<Test::WWW::Mechanize::Catalyst>
+module meshes the two to allow easy testing of L<Catalyst> applications without
+needing to starting up a web server.
 
 Testing web applications has always been a bit tricky, normally
-starting a web server for your application and making real HTTP
+requiring starting a web server for your application and making real HTTP
 requests to it. This module allows you to test L<Catalyst> web
-applications but does not start a server or issue HTTP
+applications but does not require a server or issue HTTP
 requests. Instead, it passes the HTTP request object directly to
 L<Catalyst>. Thus you do not need to use a real hostname:
 "http://localhost/" will do. However, this is optional. The following
@@ -229,16 +281,23 @@ Links which do not begin with / or are not for localhost can be handled
 as normal Web requests - this is handy if you have an external 
 single sign-on system. You must set allow_external to true for this:
 
-  $m->allow_external(1);
+  $mech->allow_external(1);
 
 You can also test a remote server by setting the environment variable
-CATALYST_SERVER, for example:
+CATALYST_SERVER; for example:
 
   $ CATALYST_SERVER=http://example.com/myapp prove -l t
 
 will run the same tests on the application running at
 http://example.com/myapp regardless of whether or not you specify
 http:://localhost for Test::WWW::Mechanize::Catalyst.    
+
+Furthermore, if you set CATALYST_SERVER, the server will be regarded 
+as a remote server even if your links point to localhost. Thus, you
+can use Test::WWW::Mechanize::Catalyst to test your live webserver
+running on your local machine, if you need to test aspects of your
+deployment environment (for example, configuration options in an
+http.conf file) instead of just the Catalyst request handling.
     
 This makes testing fast and easy. L<Test::WWW::Mechanize> provides
 functions for common web testing scenarios. For example:
@@ -258,7 +317,7 @@ screen. By default this module will treat responses which are the
 debug screen as failures. If you actually want to test debug screens,
 please use:
 
-  $m->{catalyst_debug} = 1;
+  $mmech->{catalyst_debug} = 1;
 
 An alternative to this module is L<Catalyst::Test>.
 
@@ -266,7 +325,7 @@ An alternative to this module is L<Catalyst::Test>.
 
 =head2 new
 
-Behaves like, and calls, L<WWW::Mechanize>'s C<new> method.  Any parms
+Behaves like, and calls, L<WWW::Mechanize>'s C<new> method.  Any params
 passed in get passed to WWW::Mechanize's constructor. Note that we
 need to pass the name of the Catalyst application to the "use":
 
@@ -321,7 +380,7 @@ Tells if the title of the page matches the given regex.
 
 =head2 $mech->title_unlike( $regex [, $desc ] )
 
-Tells if the title of the page matches the given regex.
+Tells if the title of the page does NOT match the given regex.
 
     $mech->title_unlike( qr/Invoices for (.+)/
 
@@ -431,8 +490,8 @@ Makes a C<follow_link()> call and executes tests on the results.
 The link must be found, and then followed successfully.  Otherwise,
 this test fails.
 
-I<%parms> is a hashref containing the parms to pass to C<follow_link()>.
-Note that the parms to C<follow_link()> are a hash whereas the parms to
+I<%parms> is a hashref containing the params to pass to C<follow_link()>.
+Note that the params to C<follow_link()> are a hash whereas the parms to
 this function are a hashref.  You have to call this function like:
 
     $agent->follow_like_ok( {n=>3}, "looking for 3rd link" );
@@ -443,6 +502,21 @@ then it will display when running the test harness in verbose mode.
 Returns true value if the specified link was found and followed
 successfully.  The HTTP::Response object returned by follow_link()
 is not available.
+
+=head1 CAVEATS
+
+=head2 External Redirects and allow_external
+
+If you use non-fully qualified urls in your test scripts (i.e. anything without
+a host, such as C<< ->get_ok( "/foo") >> ) and your app redirects to an
+external URL, expect to be bitten once you come back to your application's urls
+(it will try to request them on the remote server.) This is due to a limitation
+in WWW::Mechanize.
+
+One workaround for this is that if you are expecting to redirect to an external
+site, clone the TWMC obeject and use the cloned object for the external
+redirect.
+
 
 =head1 SEE ALSO
 

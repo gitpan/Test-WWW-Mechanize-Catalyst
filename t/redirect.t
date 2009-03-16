@@ -1,8 +1,8 @@
-#!perl -T
+#!perl
 use strict;
 use warnings;
 use lib 'lib';
-use Test::More tests => 27;
+use Test::More tests => 28;
 use lib 't/lib';
 use Test::WWW::Mechanize::Catalyst 'Catty';
 
@@ -30,3 +30,6 @@ my $prev = $m->response->previous->previous;
 ok( $prev, "have a previous previous" );
 is( $prev->code, 302, "was a redirect" );
 like( $prev->header('Location'), '/hi$/', "to the right place" );
+
+$m->get("$root/redirect_with_500");
+is ($m->status, 500, "Redirect not followed on 500");

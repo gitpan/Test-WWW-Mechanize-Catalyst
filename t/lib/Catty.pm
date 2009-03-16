@@ -1,6 +1,7 @@
 package Catty;
 
 use strict;
+use warnings;
 
 #use Catalyst;
 use Catalyst;
@@ -76,6 +77,13 @@ sub check_auth_basic : Global {
     }
 }
 
+sub redirect_with_500 : Global {
+    my ( $self, $c ) = @_;
+    $DB::single = 1;
+    $c->res->redirect( $c->uri_for("/bonjour"));
+    die "erk!";
+}
+
 sub die : Global {
     my ( $self, $context ) = @_;
     my $html = html( "Die", "This is the die page" );
@@ -125,6 +133,15 @@ sub gzipped : Global {
     $c->response->output( Compress::Zlib::memGzip($html) );
     $c->response->content_encoding('gzip');
     $c->response->headers->push_header( 'Vary', 'Accept-Encoding' );
+}
+
+sub user_agent : Global {
+    my ( $self, $c ) = @_;
+    
+    my $html = html($c->req->user_agent, $c->req->user_agent);
+    $c->response->content_type("text/html; charset=utf-8");
+    $c->response->output( $html );
+    
 }
 
 1;

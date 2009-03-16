@@ -24,15 +24,16 @@ DESCRIPTION
     Test::WWW::Mechanize is a subclass of WWW::Mechanize that incorporates
     features for web application testing. The Test::WWW::Mechanize::Catalyst
     module meshes the two to allow easy testing of Catalyst applications
-    without starting up a web server.
+    without needing to starting up a web server.
 
-    Testing web applications has always been a bit tricky, normally starting
-    a web server for your application and making real HTTP requests to it.
-    This module allows you to test Catalyst web applications but does not
-    start a server or issue HTTP requests. Instead, it passes the HTTP
-    request object directly to Catalyst. Thus you do not need to use a real
-    hostname: "http://localhost/" will do. However, this is optional. The
-    following two lines of code do exactly the same thing:
+    Testing web applications has always been a bit tricky, normally
+    requiring starting a web server for your application and making real
+    HTTP requests to it. This module allows you to test Catalyst web
+    applications but does not require a server or issue HTTP requests.
+    Instead, it passes the HTTP request object directly to Catalyst. Thus
+    you do not need to use a real hostname: "http://localhost/" will do.
+    However, this is optional. The following two lines of code do exactly
+    the same thing:
 
       $mech->get_ok('/action');
       $mech->get_ok('http://localhost/action');
@@ -41,16 +42,23 @@ DESCRIPTION
     as normal Web requests - this is handy if you have an external single
     sign-on system. You must set allow_external to true for this:
 
-      $m->allow_external(1);
+      $mech->allow_external(1);
 
     You can also test a remote server by setting the environment variable
-    CATALYST_SERVER, for example:
+    CATALYST_SERVER; for example:
 
       $ CATALYST_SERVER=http://example.com/myapp prove -l t
 
     will run the same tests on the application running at
     http://example.com/myapp regardless of whether or not you specify
     http:://localhost for Test::WWW::Mechanize::Catalyst.
+
+    Furthermore, if you set CATALYST_SERVER, the server will be regarded as
+    a remote server even if your links point to localhost. Thus, you can use
+    Test::WWW::Mechanize::Catalyst to test your live webserver running on
+    your local machine, if you need to test aspects of your deployment
+    environment (for example, configuration options in an http.conf file)
+    instead of just the Catalyst request handling.
 
     This makes testing fast and easy. Test::WWW::Mechanize provides
     functions for common web testing scenarios. For example:
@@ -69,15 +77,15 @@ DESCRIPTION
     By default this module will treat responses which are the debug screen
     as failures. If you actually want to test debug screens, please use:
 
-      $m->{catalyst_debug} = 1;
+      $mmech->{catalyst_debug} = 1;
 
     An alternative to this module is Catalyst::Test.
 
 CONSTRUCTOR
   new
-    Behaves like, and calls, WWW::Mechanize's "new" method. Any parms passed
-    in get passed to WWW::Mechanize's constructor. Note that we need to pass
-    the name of the Catalyst application to the "use":
+    Behaves like, and calls, WWW::Mechanize's "new" method. Any params
+    passed in get passed to WWW::Mechanize's constructor. Note that we need
+    to pass the name of the Catalyst application to the "use":
 
       use Test::WWW::Mechanize::Catalyst 'Catty';
       my $mech = Test::WWW::Mechanize::Catalyst->new;
@@ -121,7 +129,7 @@ METHODS
         $mech->title_like( qr/Invoices for (.+)/
 
   $mech->title_unlike( $regex [, $desc ] )
-    Tells if the title of the page matches the given regex.
+    Tells if the title of the page does NOT match the given regex.
 
         $mech->title_unlike( qr/Invoices for (.+)/
 
@@ -215,8 +223,8 @@ METHODS
     must be found, and then followed successfully. Otherwise, this test
     fails.
 
-    *%parms* is a hashref containing the parms to pass to "follow_link()".
-    Note that the parms to "follow_link()" are a hash whereas the parms to
+    *%parms* is a hashref containing the params to pass to "follow_link()".
+    Note that the params to "follow_link()" are a hash whereas the parms to
     this function are a hashref. You have to call this function like:
 
         $agent->follow_like_ok( {n=>3}, "looking for 3rd link" );
@@ -227,6 +235,18 @@ METHODS
     Returns true value if the specified link was found and followed
     successfully. The HTTP::Response object returned by follow_link() is not
     available.
+
+CAVEATS
+  External Redirects and allow_external
+    If you use non-fully qualified urls in your test scripts (i.e. anything
+    without a host, such as "->get_ok( "/foo")" ) and your app redirects to
+    an external URL, expect to be bitten once you come back to your
+    application's urls (it will try to request them on the remote server.)
+    This is due to a limitation in WWW::Mechanize.
+
+    One workaround for this is that if you are expecting to redirect to an
+    external site, clone the TWMC obeject and use the cloned object for the
+    external redirect.
 
 SEE ALSO
     Related modules which may be of interest: Catalyst,

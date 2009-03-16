@@ -1,5 +1,12 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.51 Mon Mar 16 10:00 GMT 2009
+     - Doc updates from thejester
+     - User agent fixes from ANDREMAR
+     - Fix bug where redirect was followed on a 500 response
+     - All remote requests (i.e. CATALYST_SERVER env var) now use our own
+       mechanize object, rather than an unconfigurable one from Catalyst:Test
+
 0.50 Tue Feb 17 09:12 GMT 2009
      - Remove warning in HTTP::Cookies
      - Call BUILDALL

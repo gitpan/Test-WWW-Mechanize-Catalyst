@@ -13,6 +13,14 @@ sub default : Private {
     $c->response->output( html( 'Root', 'Hello, test ☺!' ) );
 }
 
+# redirect to a redirect
+sub hello: Global {
+    my ( $self, $context ) = @_;
+    my $where = $context->uri_for('/');
+    $context->response->redirect($where);
+    return;
+}
+
 sub html {
     my ( $title, $body ) = @_;
     return qq[

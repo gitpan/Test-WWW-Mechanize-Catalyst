@@ -19,8 +19,8 @@ t/lib/CattySession.pm
 t/lib/ExternalCatty.pm
 t/multi_content_type.t
 t/pod.t
-t/pod_coverage.t
 t/redirect.t
 t/simple.t
 t/two_app.t
+t/useragent.t
 t/white_label.t
