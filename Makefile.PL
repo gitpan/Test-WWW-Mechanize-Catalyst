@@ -1,5 +1,5 @@
 #!perl
-use inc::Module::Install 0.79;
+use inc::Module::Install 0.87;
 
 use strict;
 use warnings;
@@ -10,7 +10,7 @@ all_from 'lib/Test/WWW/Mechanize/Catalyst.pm';
 requires 'Catalyst'                                 => '5.00';
 requires 'LWP'                                      => '5.816';
 requires 'Test::WWW::Mechanize'                     => '1.14';
-requires 'WWW::Mechanize'                           => '1.50';
+requires 'WWW::Mechanize'                           => '1.54';
 requires 'Moose'                                    => '0.67';
 requires 'namespace::clean'                         => '0.09';
 
@@ -23,5 +23,7 @@ if ($Module::Install::AUTHOR) {
   system('pod2text lib/Test/WWW/Mechanize/Catalyst.pm > README');
 }
 
+
+resources repository => 'http://dev.catalyst.perl.org/repos/Catalyst/Test-WWW-Mechanize-Catalyst/trunk/';
 
 WriteAll;

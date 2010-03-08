@@ -15,8 +15,11 @@ README
 t/auth-test.t
 t/cookies.t
 t/lib/Catty.pm
+t/lib/Catty/Controller/Root.pm
 t/lib/CattySession.pm
+t/lib/CattySession/Controller/Root.pm
 t/lib/ExternalCatty.pm
+t/lib/ExternalCatty/Controller/Root.pm
 t/multi_content_type.t
 t/pod.t
 t/redirect.t

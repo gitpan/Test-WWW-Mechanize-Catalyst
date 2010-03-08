@@ -1,5 +1,13 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.52 Mon Mar 8 01:25 GMT 2010
+     - Move actions out of the test applications to avoid deprecation warnings.
+     - POD corrections by jhannah
+     - Bump version dependency of Test::WWW::Mechanize to 1.54 to fix RT#44555
+     - Wrap checks for the appropriate plugins to skip tests inside a BEGIN
+       block so that they are run before the app tries to be loaded at compile
+       time, fixing RT#47037
+
 0.51 Mon Mar 16 10:00 GMT 2009
      - Doc updates from thejester
      - User agent fixes from ANDREMAR

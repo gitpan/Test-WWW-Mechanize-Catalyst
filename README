@@ -14,8 +14,8 @@ SYNOPSIS
       $mech->content_contains("This is the root page", "Correct content");
       $mech->follow_link_ok({text => 'Hello'}, "Click on Hello");
       # ... and all other Test::WWW::Mechanize methods
-      
-  # White label site testing
+  
+      # White label site testing
       $mech->host("foo.com");
       $mech->get_ok("/");
 
@@ -24,7 +24,7 @@ DESCRIPTION
     Test::WWW::Mechanize is a subclass of WWW::Mechanize that incorporates
     features for web application testing. The Test::WWW::Mechanize::Catalyst
     module meshes the two to allow easy testing of Catalyst applications
-    without needing to starting up a web server.
+    without needing to start up a web server.
 
     Testing web applications has always been a bit tricky, normally
     requiring starting a web server for your application and making real
@@ -73,11 +73,11 @@ DESCRIPTION
     To use this module you must pass it the name of the application. See the
     SYNOPSIS above.
 
-    Note that Catalyst has a special developing feature: the debug screen.
+    Note that Catalyst has a special development feature: the debug screen.
     By default this module will treat responses which are the debug screen
     as failures. If you actually want to test debug screens, please use:
 
-      $mmech->{catalyst_debug} = 1;
+      $mech->{catalyst_debug} = 1;
 
     An alternative to this module is Catalyst::Test.
 
@@ -96,7 +96,7 @@ METHODS
     as normal Web requests - this is handy if you have an external single
     sign-on system. You must set allow_external to true for this:
 
-      $m->allow_external(1);
+      $mech->allow_external(1);
 
     head2 catalyst_app
 
@@ -134,7 +134,7 @@ METHODS
         $mech->title_unlike( qr/Invoices for (.+)/
 
   $mech->content_is( $str [, $desc ] )
-    Tells if the content of the page matches the given string
+    Tells if the content of the page matches the given string.
 
   $mech->content_contains( $str [, $desc ] )
     Tells if the content of the page contains *$str*.
@@ -209,10 +209,10 @@ METHODS
             'Check all links are restricted' );
 
   $mech->link_content_unlike( $links, $regex [, $desc ] )
-    Check the current page for specified links and test the content of each
-    does not match *$regex*. The links may be specified as a reference to an
-    array containing WWW::Mechanize::Link objects, an array of URLs, or a
-    scalar URL name.
+    Check the current page for specified links and test that the content of
+    each does not match *$regex*. The links may be specified as a reference
+    to an array containing WWW::Mechanize::Link objects, an array of URLs,
+    or a scalar URL name.
 
         my @links = $mech->links();
         $mech->link_content_like( \@links, qr/Restricted/,
@@ -227,7 +227,7 @@ METHODS
     Note that the params to "follow_link()" are a hash whereas the parms to
     this function are a hashref. You have to call this function like:
 
-        $agent->follow_like_ok( {n=>3}, "looking for 3rd link" );
+        $agent->follow_link_ok( {n=>3}, "looking for 3rd link" );
 
     As with other test functions, $comment is optional. If it is supplied
     then it will display when running the test harness in verbose mode.
@@ -241,11 +241,11 @@ CAVEATS
     If you use non-fully qualified urls in your test scripts (i.e. anything
     without a host, such as "->get_ok( "/foo")" ) and your app redirects to
     an external URL, expect to be bitten once you come back to your
-    application's urls (it will try to request them on the remote server.)
+    application's urls (it will try to request them on the remote server).
     This is due to a limitation in WWW::Mechanize.
 
     One workaround for this is that if you are expecting to redirect to an
-    external site, clone the TWMC obeject and use the cloned object for the
+    external site, clone the TWMC object and use the cloned object for the
     external redirect.
 
 SEE ALSO
@@ -258,7 +258,7 @@ AUTHOR
     Original Author: Leon Brocard, "<acme@astray.com>"
 
 COPYRIGHT
-    Copyright (C) 2005-8, Leon Brocard
+    Copyright (C) 2005-9, Leon Brocard
 
 LICENSE
     This module is free software; you can redistribute it or modify it under

@@ -12,7 +12,7 @@ extends 'Test::WWW::Mechanize', 'Moose::Object';
 
 #use namespace::clean -execept => 'meta';
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 our $APP_CLASS;
 my $Test = Test::Builder->new();
 
@@ -263,7 +263,7 @@ L<Catalyst> is an elegant MVC Web Application Framework.
 L<Test::WWW::Mechanize> is a subclass of L<WWW::Mechanize> that incorporates
 features for web application testing. The L<Test::WWW::Mechanize::Catalyst>
 module meshes the two to allow easy testing of L<Catalyst> applications without
-needing to starting up a web server.
+needing to start up a web server.
 
 Testing web applications has always been a bit tricky, normally
 requiring starting a web server for your application and making real HTTP
@@ -312,12 +312,12 @@ This module supports cookies automatically.
 To use this module you must pass it the name of the application. See
 the SYNOPSIS above.
 
-Note that Catalyst has a special developing feature: the debug
+Note that Catalyst has a special development feature: the debug
 screen. By default this module will treat responses which are the
 debug screen as failures. If you actually want to test debug screens,
 please use:
 
-  $mmech->{catalyst_debug} = 1;
+  $mech->{catalyst_debug} = 1;
 
 An alternative to this module is L<Catalyst::Test>.
 
@@ -340,7 +340,7 @@ Links which do not begin with / or are not for localhost can be handled
 as normal Web requests - this is handy if you have an external 
 single sign-on system. You must set allow_external to true for this:
 
-  $m->allow_external(1);
+  $mech->allow_external(1);
 
 head2 catalyst_app
 
@@ -386,7 +386,7 @@ Tells if the title of the page does NOT match the given regex.
 
 =head2 $mech->content_is( $str [, $desc ] )
 
-Tells if the content of the page matches the given string
+Tells if the content of the page matches the given string.
 
 =head2 $mech->content_contains( $str [, $desc ] )
 
@@ -475,7 +475,7 @@ or a scalar URL name.
 
 =head2 $mech->link_content_unlike( $links, $regex [, $desc ] )
 
-Check the current page for specified links and test the content of each
+Check the current page for specified links and test that the content of each
 does not match I<$regex>.  The links may be specified as a reference to
 an array containing L<WWW::Mechanize::Link> objects, an array of URLs,
 or a scalar URL name.
@@ -494,7 +494,7 @@ I<%parms> is a hashref containing the params to pass to C<follow_link()>.
 Note that the params to C<follow_link()> are a hash whereas the parms to
 this function are a hashref.  You have to call this function like:
 
-    $agent->follow_like_ok( {n=>3}, "looking for 3rd link" );
+    $agent->follow_link_ok( {n=>3}, "looking for 3rd link" );
 
 As with other test functions, C<$comment> is optional.  If it is supplied
 then it will display when running the test harness in verbose mode.
@@ -510,11 +510,11 @@ is not available.
 If you use non-fully qualified urls in your test scripts (i.e. anything without
 a host, such as C<< ->get_ok( "/foo") >> ) and your app redirects to an
 external URL, expect to be bitten once you come back to your application's urls
-(it will try to request them on the remote server.) This is due to a limitation
+(it will try to request them on the remote server). This is due to a limitation
 in WWW::Mechanize.
 
 One workaround for this is that if you are expecting to redirect to an external
-site, clone the TWMC obeject and use the cloned object for the external
+site, clone the TWMC object and use the cloned object for the external
 redirect.
 
 
@@ -531,7 +531,7 @@ Original Author: Leon Brocard, C<< <acme@astray.com> >>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005-8, Leon Brocard
+Copyright (C) 2005-9, Leon Brocard
 
 =head1 LICENSE
 

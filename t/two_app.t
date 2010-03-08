@@ -4,19 +4,22 @@ use warnings;
 use Test::More;
 use lib 't/lib';
 
-eval {
-    require Catalyst::Plugin::Session;
-    require Catalyst::Plugin::Session::State::Cookie;
-};
+BEGIN {
+    eval {
+        require Catalyst::Plugin::Session;
+        require Catalyst::Plugin::Session::State::Cookie;
+    };
 
-if ($@) {
-    diag($@);
-    plan skip_all => "Need Catalyst::Plugin::Session to run this test";
-} else {
-    plan tests => 4;
+    if ($@) {
+        diag($@);
+        plan skip_all => "Need Catalyst::Plugin::Session to run this test";
+        exit 0;
+    }
 }
 
 use Test::WWW::Mechanize::Catalyst;
+
+plan tests => 4;
 
 my $m1 = Test::WWW::Mechanize::Catalyst->new(catalyst_app => 'Catty');
 my $m2 = Test::WWW::Mechanize::Catalyst->new(catalyst_app => 'CattySession');
