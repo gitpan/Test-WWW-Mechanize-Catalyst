@@ -1,5 +1,13 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.53 Sun Dec 5 23:03 GMT 2010
+     - Fix tests to work with the upcoming psgi based Catalyst release
+       as $c->req->header('Host') now more accurately reflects what you
+       see in a real web server (i.e. the port will not be defined if it
+       is 80)
+     - Fix tests to work when the CATALYST_DEBUG environment variable is
+       set by explicitly setting it to 0 in tests which require it.
+
 0.52 Mon Mar 8 01:25 GMT 2010
      - Move actions out of the test applications to avoid deprecation warnings.
      - POD corrections by jhannah

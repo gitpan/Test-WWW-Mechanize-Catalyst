@@ -5,6 +5,10 @@ use warnings;
 use Encode qw();
 use Test::More tests => 37;
 use lib 't/lib';
+BEGIN {
+    $ENV{CATALYST_DEBUG} = 0;
+    $ENV{CATTY_DEBUG} = 0;
+}
 use Test::WWW::Mechanize::Catalyst 'Catty';
 
 my $root = "http://localhost";

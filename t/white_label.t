@@ -9,8 +9,8 @@ my $m = Test::WWW::Mechanize::Catalyst->new(catalyst_app => 'Catty');
 
 $m->host('foo.com');
 $m->get_ok('/host');
-$m->content_contains('Host: foo.com:80');
+$m->content_contains('Host: foo.com');
 
 $m->clear_host;
 $m->get_ok('/host');
-$m->content_contains('Host: localhost:80') or diag $m->content;
+$m->content_contains('Host: localhost') or diag $m->content;
