@@ -1,5 +1,9 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.54 Mon Aug 1 20:49 BST 2011
+     - change to make sure we support changes in Catalyst::Test introduced
+       in the Cataplack port.
+
 0.53 Sun Dec 5 23:03 GMT 2010
      - Fix tests to work with the upcoming psgi based Catalyst release
        as $c->req->header('Host') now more accurately reflects what you

@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 name 'Test-WWW-Mechanize-Catalyst';
+perl_version '5.008004';
 all_from 'lib/Test/WWW/Mechanize/Catalyst.pm';
 
 requires 'Catalyst'                                 => '5.00';

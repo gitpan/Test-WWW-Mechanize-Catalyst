@@ -12,7 +12,7 @@ extends 'Test::WWW::Mechanize', 'Moose::Object';
 
 #use namespace::clean -execept => 'meta';
 
-our $VERSION = '0.53';
+our $VERSION = '0.54';
 our $APP_CLASS;
 my $Test = Test::Builder->new();
 
@@ -148,14 +148,18 @@ sub _do_catalyst_request {
 
       $request->header('Host', $host);
     }
- 
+
     my $res = $self->_check_external_request($request);
     return $res if $res;
 
     my @creds = $self->get_basic_credentials( "Basic", $uri );
     $request->authorization_basic( @creds ) if @creds;
 
-    my $response =Catalyst::Test::local_request($self->{catalyst_app}, $request);
+    require Catalyst;
+    my $response = $Catalyst::VERSION >= 5.89000 ?
+      Catalyst::Test::_local_request($self->{catalyst_app}, $request) :
+        Catalyst::Test::local_request($self->{catalyst_app}, $request);
+
 
     # LWP would normally do this, but we dont get down that far.
     $response->request($request);

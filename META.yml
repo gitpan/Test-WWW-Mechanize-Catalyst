@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: 6.42
 distribution_type: module
-generated_by: 'Module::Install version 0.99'
+generated_by: 'Module::Install version 1.01'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +28,8 @@ requires:
   Test::WWW::Mechanize: 1.14
   WWW::Mechanize: 1.54
   namespace::clean: 0.09
+  perl: 5.8.4
 resources:
   license: http://dev.perl.org/licenses/
   repository: http://dev.catalyst.perl.org/repos/Catalyst/Test-WWW-Mechanize-Catalyst/trunk/
-version: 0.53
+version: 0.54

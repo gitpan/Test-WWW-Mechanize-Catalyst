@@ -1,10 +1,11 @@
 package ExternalCatty;
 use strict;
 use warnings;
-use Catalyst qw/-Engine=HTTP/;
+use Catalyst;
 
 __PACKAGE__->config( name => 'ExternalCatty' );
 __PACKAGE__->setup;
+__PACKAGE__->setup_engine('HTTP');
 
 # The Cat HTTP server background option is useless here :-(
 # Thus we have to provide our own background method.
