@@ -1,5 +1,8 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.55 Tue Sep 27 19:20 BST 2011
+     - Set 'Host' header for remote requests too
+
 0.54 Mon Aug 1 20:49 BST 2011
      - change to make sure we support changes in Catalyst::Test introduced
        in the Cataplack port.

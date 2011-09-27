@@ -12,7 +12,7 @@ extends 'Test::WWW::Mechanize', 'Moose::Object';
 
 #use namespace::clean -execept => 'meta';
 
-our $VERSION = '0.54';
+our $VERSION = '0.55';
 our $APP_CLASS;
 my $Test = Test::Builder->new();
 
@@ -126,6 +126,17 @@ sub _make_request {
     return $response;
 }
 
+sub _set_host_header {
+    my ( $self, $request ) = @_;
+    # If there's no Host header, set one.
+    unless ($request->header('Host')) {
+      my $host = $self->has_host
+               ? $self->host
+               : $request->uri->host;
+      $request->header('Host', $host);
+    }
+}
+
 sub _do_catalyst_request {
     my ($self, $request) = @_;
 
@@ -140,14 +151,7 @@ sub _do_catalyst_request {
     return $self->_do_remote_request($request)
       if $ENV{CATALYST_SERVER};
 
-    # If there's no Host header, set one.
-    unless ($request->header('Host')) {
-      my $host = $self->has_host
-               ? $self->host
-               : $uri->host;
-
-      $request->header('Host', $host);
-    }
+    $self->_set_host_header($request);
 
     my $res = $self->_check_external_request($request);
     return $res if $res;
@@ -219,6 +223,7 @@ sub _do_remote_request {
     $request->uri->host( $server->host );
     $request->uri->port( $server->port );
     $request->uri->path( $server->path . $request->uri->path );
+    $self->_set_host_header($request);
     return $self->SUPER::_make_request($request);
 }
 
