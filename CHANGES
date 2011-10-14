@@ -1,5 +1,8 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.56 Thu Oct 13 21:05 BRT 2011
+     - Add port to Host header
+
 0.55 Tue Sep 27 19:20 BST 2011
      - Set 'Host' header for remote requests too
 

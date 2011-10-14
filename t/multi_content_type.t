@@ -10,7 +10,7 @@ BEGIN {
     $ENV{CATALYST_SERVER} ||= "http://localhost:$PORT";
 }
 
-use Test::More tests => 8;
+use Test::More tests => 9;
 use Test::Exception;
 
 BEGIN {
@@ -42,7 +42,7 @@ TRY_CONNECT: {
 }
 
 SKIP: {
-  skip $skip, 7 if $skip;
+  skip $skip, 8 if $skip;
   lives_ok { $m->get_ok( '/', 'Get a multi Content-Type response' ) }
   'Survive to a multi Content-Type sting';
 
@@ -53,6 +53,10 @@ SKIP: {
   # Test a redirect with a remote server now too.
   $m->get_ok( '/hello' );
   is($m->uri, "$ENV{CATALYST_SERVER}/");
+
+  $m->get_ok( '/host' );
+  $m->content_contains('Host: localhost:$PORT') or diag $m->content;
+
 }
 
 END {

@@ -12,7 +12,7 @@ extends 'Test::WWW::Mechanize', 'Moose::Object';
 
 #use namespace::clean -execept => 'meta';
 
-our $VERSION = '0.55';
+our $VERSION = '0.56';
 our $APP_CLASS;
 my $Test = Test::Builder->new();
 
@@ -133,6 +133,7 @@ sub _set_host_header {
       my $host = $self->has_host
                ? $self->host
                : $request->uri->host;
+      $host .= ':'.$request->uri->_port if $request->uri->_port;
       $request->header('Host', $host);
     }
 }
