@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use lib 'lib';
-use Test::More tests => 28;
+use Test::More tests => 29;
 use lib 't/lib';
 use Test::WWW::Mechanize::Catalyst 'Catty';
 
@@ -33,3 +33,7 @@ like( $prev->header('Location'), '/hi$/', "to the right place" );
 
 $m->get("$root/redirect_with_500");
 is ($m->status, 500, "Redirect not followed on 500");
+
+$m->get_ok( "$root/redirect_to_utf8_upgraded_string",
+            "redirect using an upgraded utf8 string" );
+

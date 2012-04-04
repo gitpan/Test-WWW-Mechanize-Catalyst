@@ -2,7 +2,6 @@ package Catty::Controller::Root;
 
 use strict;
 use warnings;
-
 use base qw/ Catalyst::Controller /;
 
 use Cwd;
@@ -135,6 +134,20 @@ sub user_agent : Global {
     $c->response->content_type("text/html; charset=utf-8");
     $c->response->output( $html );
 
+}
+
+# per https://rt.cpan.org/Ticket/Display.html?id=36442
+sub bad_content_encoding :Global {
+    my($self, $c) = @_;
+    $c->res->content_encoding('duff');
+    $c->res->body('foo');
+}
+
+sub redirect_to_utf8_upgraded_string {
+    my($self, $c) = @_;
+    my $where = $c->uri_for('hello')->stringify;
+    utf8::upgrade($where);
+    $c->res->redirect($where);
 }
 
 1;

@@ -7,7 +7,6 @@ my $PORT;
 
 BEGIN {
     $PORT = $ENV{TWMC_TEST_PORT} || 7357;
-    $ENV{CATALYST_SERVER} ||= "http://localhost:$PORT";
 }
 
 use Test::More tests => 9;
@@ -27,7 +26,9 @@ BEGIN {
 $SIG{INT} = sub { warn "INT:$$"; exit };
 
 use_ok 'ExternalCatty';
-my $pid = ExternalCatty->background($PORT);
+my $pid;
+($pid, $PORT) = ExternalCatty->background($PORT);
+$ENV{CATALYST_SERVER} ||= "http://localhost:$PORT";
 
 use Test::WWW::Mechanize::Catalyst;
 my $m = Test::WWW::Mechanize::Catalyst->new;
