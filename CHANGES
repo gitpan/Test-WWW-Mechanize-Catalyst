@@ -1,5 +1,11 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.58 Sat Jun 30 17:01 BST 2012
+     - Fix external server test.
+     - Fix infinite redirects. RT#76614
+     - Make fail to start server more verbose. RT#77174
+     - Fix test skip count. RT#77181
+
 0.57 Wed Apr 4 10:03 BRT 2012
      - Fixed RT 52270
 

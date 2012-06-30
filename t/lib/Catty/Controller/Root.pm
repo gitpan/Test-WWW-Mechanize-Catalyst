@@ -7,6 +7,7 @@ use base qw/ Catalyst::Controller /;
 use Cwd;
 use MIME::Base64;
 use Encode ();
+use utf8;
 
 __PACKAGE__->config( namespace => '' );
 
@@ -120,7 +121,7 @@ sub gzipped : Global {
   # control both ends, so just always gzip the response.
     require Compress::Zlib;
 
-    my $html = html( "Hello", "Hi there! ☺" );
+    my $html = Encode::encode('UTF-8', html( "Hello", "Hi there! ☺" ));
     $c->response->content_type("text/html; charset=utf-8");
     $c->response->output( Compress::Zlib::memGzip($html) );
     $c->response->content_encoding('gzip');
@@ -143,9 +144,9 @@ sub bad_content_encoding :Global {
     $c->res->body('foo');
 }
 
-sub redirect_to_utf8_upgraded_string {
+sub redirect_to_utf8_upgraded_string : Global {
     my($self, $c) = @_;
-    my $where = $c->uri_for('hello')->stringify;
+    my $where = $c->uri_for('hello', 'müller')->as_string;
     utf8::upgrade($where);
     $c->res->redirect($where);
 }

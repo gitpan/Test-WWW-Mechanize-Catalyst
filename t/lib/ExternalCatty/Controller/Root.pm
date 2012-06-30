@@ -33,5 +33,14 @@ sub html {
 ];
 }
 
+sub host : Global {
+    my ($self, $c) = @_;
+
+    my $host = $c->req->header('Host') || "<undef>";
+    my $html = html( $c->config->{name}, "Host: $host" );
+    $c->response->content_type("text/html");
+    $c->response->output($html);
+}
+
 1;
 

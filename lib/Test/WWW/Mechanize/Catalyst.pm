@@ -12,7 +12,7 @@ extends 'Test::WWW::Mechanize', 'Moose::Object';
 
 #use namespace::clean -execept => 'meta';
 
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 our $APP_CLASS;
 my $Test = Test::Builder->new();
 
@@ -72,7 +72,7 @@ sub BUILD {
 }
 
 sub _make_request {
-    my ( $self, $request ) = @_;
+    my ( $self, $request, $arg, $size, $previous) = @_;
 
     my $response = $self->_do_catalyst_request($request);
     $response->header( 'Content-Base', $response->request->uri )
@@ -94,35 +94,44 @@ sub _make_request {
         $response->content_type('');
     }
 
+    # NOTE: cargo-culted redirect checking from LWP::UserAgent:
+    $response->previous($previous) if $previous;
+    my $redirects = defined $response->redirects ? $response->redirects : 0;
+    if ($redirects > 0 and $redirects >= $self->max_redirect) {
+        return $self->_redirect_loop_detected($response);
+    }
+
     # check if that was a redirect
     if (   $response->header('Location')
         && $response->is_redirect
         && $self->redirect_ok( $request, $response ) )
     {
+        return $self->_redirect_loop_detected($response) if $self->max_redirect <= 0;
 
-        # remember the old response
-        my $old_response = $response;
+        # TODO: this should probably create the request by cloning the original
+        # request and modifying it as LWP::UserAgent::request does.  But for now...
 
         # *where* do they want us to redirect to?
-        my $location = $old_response->header('Location');
+        my $location = $response->header('Location');
 
         # no-one *should* be returning non-absolute URLs, but if they
         # are then we'd better cope with it.  Let's create a new URI, using
         # our request as the base.
         my $uri = URI->new_abs( $location, $request->uri )->as_string;
-
-        # make a new response, and save the old response in it
-        $response = $self->_make_request( HTTP::Request->new( GET => $uri ) );
-        my $end_of_chain = $response;
-        while ( $end_of_chain->previous )    # keep going till the end
-        {
-            $end_of_chain = $end_of_chain->previous;
-        }                                          #   of the chain...
-        $end_of_chain->previous($old_response);    # ...and add us to it
+        my $referral = HTTP::Request->new( GET => $uri );
+        return $self->request( $referral, $arg, $size, $response );
     } else {
         $response->{_raw_content} = $response->content;
     }
 
+    return $response;
+}
+
+sub _redirect_loop_detected {
+    my ( $self, $response ) = @_;
+    $response->header("Client-Warning" =>
+                      "Redirect loop detected (max_redirect = " . $self->max_redirect . ")");
+    $response->{_raw_content} = $response->content;
     return $response;
 }
 

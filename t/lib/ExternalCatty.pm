@@ -2,11 +2,11 @@ package ExternalCatty;
 use strict;
 use warnings;
 use Catalyst;
+use Catalyst::ScriptRunner;
 use IO::Socket::INET;
 
 __PACKAGE__->config( name => 'ExternalCatty' );
 __PACKAGE__->setup;
-__PACKAGE__->setup_engine('HTTP');
 
 sub MAX_PORT_TRIES() { 5 }
 
@@ -24,8 +24,8 @@ sub background {
         require POSIX;
         POSIX::setsid() or die "Can't start a new session: $!";
     }
-
-    return($self->run($port), $port);
+    local @ARGV = ('-p', $port);
+    Catalyst::ScriptRunner->run(__PACKAGE__, 'Server');
 }
 
 sub assert_or_find_available_port {

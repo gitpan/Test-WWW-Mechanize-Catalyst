@@ -14,6 +14,7 @@ META.yml
 README
 t/auth-test.t
 t/cookies.t
+t/decoded_content.t
 t/lib/Catty.pm
 t/lib/Catty/Controller/Root.pm
 t/lib/CattySession.pm

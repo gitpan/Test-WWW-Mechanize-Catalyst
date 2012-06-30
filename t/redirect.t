@@ -2,9 +2,12 @@
 use strict;
 use warnings;
 use lib 'lib';
-use Test::More tests => 29;
+use Test::More;
 use lib 't/lib';
 use Test::WWW::Mechanize::Catalyst 'Catty';
+use HTTP::Request::Common;
+use URI;
+use Test::utf8;
 
 my $root = "http://localhost";
 
@@ -34,6 +37,39 @@ like( $prev->header('Location'), '/hi$/', "to the right place" );
 $m->get("$root/redirect_with_500");
 is ($m->status, 500, "Redirect not followed on 500");
 
-$m->get_ok( "$root/redirect_to_utf8_upgraded_string",
-            "redirect using an upgraded utf8 string" );
+my $req = GET "$root/redirect_to_utf8_upgraded_string";
+my $loc = $m->_do_catalyst_request($req)->header('Location'); 
+my $uri = URI->new_abs( $loc, $req->uri )->as_string;
+is_sane_utf8($uri);
+isnt_flagged_utf8($uri);
+
+# Check for max_redirects support
+{
+    $m = Test::WWW::Mechanize::Catalyst->new(max_redirect => 1);
+    is( $m->max_redirect, 1, 'max_redirect set' );
+
+    $m->get( "$root/bonjour" );
+    ok( !$m->success, "get /bonjour with max_redirect=1 is not a success" );
+    is( $m->response->redirects, 1, 'redirects only once' );
+    like( $m->response->header('Client-Warning'), qr/Redirect loop detected/i,
+          'sets Client-Warning header' );
+}
+
+# Make sure we can handle max_redirects=0
+{
+    $m = Test::WWW::Mechanize::Catalyst->new(max_redirect => 0);
+    $m->get( "$root/hello" );
+    ok( $m->success, "get /hello with max_redirect=0 succeeds" );
+    is( $m->response->redirects, 0, 'no redirects' );
+    ok( !$m->response->header('Client-Warning'), 'no Client-Warning header' );
+
+    # shouldn't be redirected if max_redirect == 0
+    $m->get( "$root/bonjour" );
+    ok( !$m->success, "get /bonjour with max_redirect=0 is not a success" );
+    is( $m->response->redirects, 0, 'no redirects' );
+    like( $m->response->header('Client-Warning'), qr/Redirect loop detected/i,
+          'sets Client-Warning header' );
+}
+
+done_testing;
 

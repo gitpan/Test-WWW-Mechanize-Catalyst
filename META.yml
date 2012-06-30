@@ -5,14 +5,15 @@ author:
 build_requires:
   Catalyst::Plugin::Session::State::Cookie: 0
   Catalyst::Plugin::Session::Store::Dummy: 0
-  ExtUtils::MakeMaker: 6.62
+  ExtUtils::MakeMaker: 6.59
   Test::Exception: 0
-  Test::More: 0
+  Test::More: 0.88
+  Test::utf8: 0
 configure_requires:
-  ExtUtils::MakeMaker: 6.62
+  ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.04'
+generated_by: 'Module::Install version 1.06'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +24,7 @@ no_index:
     - inc
     - t
 requires:
-  Catalyst: 5.00
+  Catalyst: 5.90
   LWP: 5.816
   Moose: 0.67
   Test::WWW::Mechanize: 1.14
@@ -32,5 +33,5 @@ requires:
   perl: 5.8.4
 resources:
   license: http://dev.perl.org/licenses/
-  repository: http://dev.catalyst.perl.org/repos/Catalyst/Test-WWW-Mechanize-Catalyst/trunk/
-version: 0.57
+  repository: git://git.shadowcat.co.uk/catagits/Test-WWW-Mechanize-Catalyst.git
+version: 0.58

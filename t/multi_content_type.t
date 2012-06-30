@@ -9,7 +9,7 @@ BEGIN {
     $PORT = $ENV{TWMC_TEST_PORT} || 7357;
 }
 
-use Test::More tests => 9;
+use Test::More;
 use Test::Exception;
 
 BEGIN {
@@ -33,17 +33,21 @@ $ENV{CATALYST_SERVER} ||= "http://localhost:$PORT";
 use Test::WWW::Mechanize::Catalyst;
 my $m = Test::WWW::Mechanize::Catalyst->new;
 
+# Yeah, sorry - wait for the forked process to spin up...
+sleep 10;
+
 my $skip = 0;
 TRY_CONNECT: {
   eval { $m->get('/') };
 
   if ($@ || $m->content =~ /Can't connect to \w+:$PORT/) {
     $skip = $@ || $m->content;
+    diag $m;
   }
 }
 
 SKIP: {
-  skip $skip, 8 if $skip;
+  skip $skip, 9 if $skip;
   lives_ok { $m->get_ok( '/', 'Get a multi Content-Type response' ) }
   'Survive to a multi Content-Type sting';
 
@@ -56,7 +60,7 @@ SKIP: {
   is($m->uri, "$ENV{CATALYST_SERVER}/");
 
   $m->get_ok( '/host' );
-  $m->content_contains('Host: localhost:$PORT') or diag $m->content;
+  $m->content_contains("Host: localhost:$PORT") or diag $m->content;
 
 }
 
@@ -65,6 +69,8 @@ END {
         kill 9, $pid;
     }
 }
+
+done_testing;
 
 1;
 
