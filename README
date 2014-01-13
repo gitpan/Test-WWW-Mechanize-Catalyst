@@ -253,7 +253,7 @@ SEE ALSO
     Test::WWW::Mechanize, WWW::Mechanize.
 
 AUTHOR
-    Ash Berlin "<ash@cpan.org>" (current maintiner)
+    Ash Berlin "<ash@cpan.org>" (current maintainer)
 
     Original Author: Leon Brocard, "<acme@astray.com>"
 

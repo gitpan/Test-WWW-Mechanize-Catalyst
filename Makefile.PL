@@ -9,6 +9,7 @@ perl_version '5.008004';
 all_from 'lib/Test/WWW/Mechanize/Catalyst.pm';
 
 requires 'Catalyst'                                 => '5.90';
+requires 'Class::Load'                              => '0.19';
 requires 'LWP'                                      => '5.816';
 requires 'Test::WWW::Mechanize'                     => '1.14';
 requires 'WWW::Mechanize'                           => '1.54';

@@ -4,15 +4,16 @@ use Moose;
 
 use Carp qw/croak/;
 require Catalyst::Test; # Do not call import
+use Class::Load qw(load_class is_class_loaded);
 use Encode qw();
 use HTML::Entities;
 use Test::WWW::Mechanize;
 
 extends 'Test::WWW::Mechanize', 'Moose::Object';
 
-#use namespace::clean -execept => 'meta';
+#use namespace::clean -except => 'meta';
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 our $APP_CLASS;
 my $Test = Test::Builder->new();
 
@@ -66,8 +67,8 @@ sub BUILD {
   unless ($ENV{CATALYST_SERVER}) {
     croak "catalyst_app attribute is required unless CATALYST_SERVER env variable is set"
       unless $self->has_catalyst_app;
-    Class::MOP::load_class($self->catalyst_app)
-      unless (Class::MOP::is_class_loaded($self->catalyst_app));
+    load_class($self->catalyst_app)
+      unless (is_class_loaded($self->catalyst_app));
   }
 }
 
@@ -175,7 +176,7 @@ sub _do_catalyst_request {
         Catalyst::Test::local_request($self->{catalyst_app}, $request);
 
 
-    # LWP would normally do this, but we dont get down that far.
+    # LWP would normally do this, but we don't get down that far.
     $response->request($request);
 
     return $response
@@ -184,7 +185,7 @@ sub _do_catalyst_request {
 sub _check_external_request {
     my ($self, $request) = @_;
 
-    # If there's no host then definatley not an external request.
+    # If there's no host then definitley not an external request.
     $request->uri->can('host_port') or return;
 
     if ( $self->allow_external && $request->uri->host_port ne 'localhost:80' ) {
@@ -241,8 +242,8 @@ sub import {
   my ($class, $app) = @_;
 
   if (defined $app) {
-    Class::MOP::load_class($app)
-      unless (Class::MOP::is_class_loaded($app));
+    load_class($app)
+      unless (is_class_loaded($app));
     $APP_CLASS = $app; 
   }
 
@@ -544,7 +545,7 @@ L<Test::WWW::Mechanize>, L<WWW::Mechanize>.
 
 =head1 AUTHOR
 
-Ash Berlin C<< <ash@cpan.org> >> (current maintiner)
+Ash Berlin C<< <ash@cpan.org> >> (current maintainer)
 
 Original Author: Leon Brocard, C<< <acme@astray.com> >>
 

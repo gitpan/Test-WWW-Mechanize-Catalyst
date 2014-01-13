@@ -1,5 +1,9 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.59 Mon Jan 13 11:23 GMT 2014
+     - Use Class::Load instead of Class::MOP::load_class(). RT#90978
+     - Fix typos in POD and comments. RT#85171
+
 0.58 Sat Jun 30 17:01 BST 2012
      - Fix external server test.
      - Fix infinite redirects. RT#76614
