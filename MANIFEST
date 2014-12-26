@@ -27,4 +27,5 @@ t/redirect.t
 t/simple.t
 t/two_app.t
 t/useragent.t
+t/utf8.t
 t/white_label.t

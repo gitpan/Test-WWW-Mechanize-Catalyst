@@ -10,6 +10,10 @@ sub default : Private {
     my ( $self, $c ) = @_;
     $c->response->content_type('text/html; charset=utf-8');
     $c->response->output( html( 'Root', 'Hello, test ☺!' ) );
+
+    # Newer Catalyst auto encodes UTF8, but this test case is borked and expects
+    # broken utf8 behavior.  We'll make a real UTF8 Test case separately.
+    $c->clear_encoding if $c->can('clear_encoding'); # Compat with upcoming Catalyst 5.90080
 }
 
 # redirect to a redirect

@@ -1,5 +1,11 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.60 Fri Dec 26 22:00 GMT 2014
+     - Make two test cases compatible with Catalyst 5.90080+ changes
+       to encoding (UTF8 because default).
+     - Added a new test case that runs only under 5.90080 and makes
+       sure that expected UTF8 stuff works.
+
 0.59 Mon Jan 13 11:23 GMT 2014
      - Use Class::Load instead of Class::MOP::load_class(). RT#90978
      - Fix typos in POD and comments. RT#85171

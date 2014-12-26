@@ -24,6 +24,10 @@ sub hello : Global {
     my $html = html( "Hello", "Hi there! $str" );
     $context->response->content_type("text/html; charset=utf-8");
     $context->response->output($html);
+
+    # Newer Catalyst auto encodes UTF8, but this test case is borked and expects
+    # broken utf8 behavior.  We'll make a real UTF8 Test case separately.
+    $context->clear_encoding if $context->can('clear_encoding'); # Compat with upcoming Catalyst 5.90080
 }
 
 # absolute redirect
